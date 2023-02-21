@@ -1,5 +1,5 @@
 {
-  "name": "event-tracking-service",
+  "name": "@wunderbar-network/event-tracking-service",
   "version": "0.1.0",
   "description": "Event Tracking Service for Vue/Node.js applications",
   "private": true,
@@ -19,9 +19,9 @@
     "clean": "rm -rf ./lib",
     "build": "npm run clean && npm run build:esm",
     "build:esm": "tsc -p ./tsconfig.json && mv lib/esm/index.js lib/esm/index.mjs",
-    "prepare": "npm run build"
+    "postinstall": "npm run build"
   },
-  "dependencies": {
+  "peerDependencies": {
     "uuid": "^9.0.0"
   },
   "devDependencies": {
@@ -37,5 +37,7 @@
     "eslint-plugin-promise": "^6.1.1",
     "prettier": "^2.8.4",
     "typescript": "^4.9.5"
-  }
+  },
+  "repository": "WunderbarNetwork/event-tracking-service",
+  "homepage": "https://github.com/WunderbarNetwork/event-tracking-service#readme"
 }
