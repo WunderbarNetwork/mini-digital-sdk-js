@@ -5,13 +5,12 @@
   "private": true,
   "exports": {
     ".": {
-      "default": {
-        "types": "./lib/types/index.d.ts",
-        "default": "./lib/index.mjs"
-      }
+      "types": "./lib/types/index.d.ts",
+      "import": "./lib/index.mjs"
     }
   },
   "type": "module",
+  "types": "./lib/types/index.d.ts",
   "files": [
     "lib/**/*"
   ],
