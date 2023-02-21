@@ -18,7 +18,8 @@
   "scripts": {
     "clean": "rm -rf ./lib",
     "build": "npm run clean && npm run build:esm",
-    "build:esm": "tsc -p ./tsconfig.json && mv lib/esm/index.js lib/esm/index.mjs"
+    "build:esm": "tsc -p ./tsconfig.json && mv lib/esm/index.js lib/esm/index.mjs",
+    "prepublish": "npm run build"
   },
   "dependencies": {
     "uuid": "^9.0.0"
