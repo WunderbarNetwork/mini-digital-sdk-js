@@ -5,7 +5,7 @@
   "private": true,
   "exports": {
     ".": {
-      "import": {
+      "default": {
         "types": "./lib/types/index.d.ts",
         "default": "./lib/index.mjs"
       }
