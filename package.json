@@ -16,13 +16,15 @@
   ],
   "scripts": {
     "clean": "rm -rf ./lib",
-    "build": "npm run clean && tsc -p ./tsconfig.json && mv lib/index.js lib/index.mjs",
+    "build": "npm run clean && tsc --build && mv lib/index.js lib/index.mjs",
     "prepare": "npm run build"
   },
-  "peerDependencies": {
+  "dependencies": {
+    "lodash": "^4.17.21",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.191",
     "@types/uuid": "^9.0.0",
     "@typescript-eslint/eslint-plugin": "^5.51.0",
     "@typescript-eslint/parser": "^5.51.0",

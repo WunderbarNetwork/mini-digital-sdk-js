@@ -3,37 +3,42 @@ import type { ServiceResponse } from "../types/ServiceResponse.js";
 
 import { v4 as uuid } from "uuid";
 
+import _ from "lodash";
+
+/**
+ * Provides an interface towards the **Mini Digital Gateway**, to submit `AnalyticsEvent` objects.
+ */
 export default class EventTrackingService {
-  protected static _instance: EventTrackingService | null = null;
-
   protected _miniDigitalGateway: string;
-  protected _userId: string;
 
-  private constructor() {
-    this._miniDigitalGateway = "https://0lv5gvqpnb.execute-api.ap-southeast-2.amazonaws.com/prod";
-    this._userId = uuid();
-  }
+  /** The User ID associated the service. Can be obtained and populated in `AnalyticsEvent` instances. */
+  public userId: string;
 
   /**
-   * Obtain a reference to the Event Tracking Service class
+   * Provide configuration to the Event Tracking Service class.
+   *
+   * @param miniDigitalGatewayUri The URI of the gateway instance. Do not include the `/events/{id}` part, just the root URI.
+   * @param userId Optional - provide an explicit User ID. If not provided, a random User ID will be generated and used with the class.
    */
-  static getService(): EventTrackingService {
-    if (EventTrackingService._instance === null) {
-      EventTrackingService._instance = new EventTrackingService();
+  constructor(miniDigitalGatewayUri: string, userId: string = uuid()) {
+    if (_.isEmpty(miniDigitalGatewayUri) || _.isEmpty(userId)) {
+      throw new Error("Invalid parameters provided to Event Tracking Service.");
     }
 
-    return EventTrackingService._instance;
-  }
+    this._miniDigitalGateway = miniDigitalGatewayUri;
+    this.userId = userId;
 
-  /**
-   * Return the User ID for the purpose of Event Tracking
-   */
-  userId(): string {
-    return this._userId;
+    // The gateway should not end with a trailing slash
+    if (this._miniDigitalGateway.endsWith("/")) {
+      this._miniDigitalGateway = this._miniDigitalGateway.substring(0, this._miniDigitalGateway.length - 1);
+    }
   }
 
   /**
    * Send the event to the gateway
+   *
+   * @param event Event to be stored
+   * @param logResponse Optional - output to console when event has been successfully posted (default = false)
    */
   async postEvent(event: AnalyticsEvent, logResponse: boolean = false): Promise<void> {
     const rawResponse = await fetch(`${this._miniDigitalGateway}/events/${event.eventId}`, {
@@ -53,7 +58,7 @@ export default class EventTrackingService {
         console.log(`Posted event: ${event.eventId}, outcome: ${serviceResponse.message} (${serviceResponse.statusCode})`);
       }
     } else {
-      throw new Error(errors?.map((e: any) => e.message).join("\n") ?? "unknown");
+      throw new Error(errors?.map((e: any) => e.message).join("\n") ?? "Unknown error has occurred.");
     }
   }
 }
