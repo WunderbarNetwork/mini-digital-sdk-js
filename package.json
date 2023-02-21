@@ -6,8 +6,8 @@
   "exports": {
     ".": {
       "import": {
-        "types": "./lib/esm/types/index.d.ts",
-        "default": "./lib/esm/index.mjs"
+        "types": "./lib/types/index.d.ts",
+        "default": "./lib/index.mjs"
       }
     }
   },
@@ -17,9 +17,8 @@
   ],
   "scripts": {
     "clean": "rm -rf ./lib",
-    "build": "npm run clean && npm run build:esm",
-    "build:esm": "tsc -p ./tsconfig.json && mv lib/esm/index.js lib/esm/index.mjs",
-    "postinstall": "npm run build"
+    "build": "npm run clean && tsc -p ./tsconfig.json && mv lib/index.js lib/index.mjs",
+    "prepare": "npm run build"
   },
   "peerDependencies": {
     "uuid": "^9.0.0"
@@ -38,6 +37,9 @@
     "prettier": "^2.8.4",
     "typescript": "^4.9.5"
   },
-  "repository": "WunderbarNetwork/event-tracking-service",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WunderbarNetwork/event-tracking-service.git"
+  },
   "homepage": "https://github.com/WunderbarNetwork/event-tracking-service#readme"
 }
