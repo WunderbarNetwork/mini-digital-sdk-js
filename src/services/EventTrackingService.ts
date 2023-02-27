@@ -41,7 +41,7 @@ export default class EventTrackingService {
    * @param logResponse Optional - output to console when event has been successfully posted (default = false)
    */
   async postEvent(event: AnalyticsEvent, logResponse: boolean = false): Promise<void> {
-    const rawResponse = await fetch(`${this._miniDigitalGateway}/events/${event.eventId}`, {
+    const response = await fetch(`${this._miniDigitalGateway}/events/${event.eventId}`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -50,15 +50,23 @@ export default class EventTrackingService {
       body: JSON.stringify(event),
     });
 
-    const { response, errors } = await rawResponse.json();
+    if (!response.ok) {
+      throw new Error(`Gateway POST error! Status: ${response.status}`);
+    }
 
-    if (rawResponse.ok) {
-      const serviceResponse = response as ServiceResponse;
+    const data = await response.json();
+
+    try {
+      const serviceResponse: ServiceResponse = {
+        message: data.message,
+        statusCode: data.statusCode,
+      };
+
       if (logResponse) {
         console.log(`Posted event: ${event.eventId}, outcome: ${serviceResponse.message} (${serviceResponse.statusCode})`);
       }
-    } else {
-      throw new Error(errors?.map((e: any) => e.message).join("\n") ?? "Unknown error has occurred.");
+    } catch (error: any) {
+      throw new Error("Could not parse the gateway response.");
     }
   }
 }
