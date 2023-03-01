@@ -1,0 +1,46 @@
+{
+  "name": "@wunderbar-network/event-tracking-service",
+  "version": "0.1.0",
+  "description": "Event Tracking Service for Vue/Node.js applications",
+  "private": true,
+  "exports": {
+    ".": {
+      "types": "./lib/types/index.d.ts",
+      "import": "./lib/index.mjs"
+    }
+  },
+  "type": "module",
+  "types": "./lib/types/index.d.ts",
+  "files": [
+    "lib/**/*"
+  ],
+  "scripts": {
+    "clean": "rm -rf ./lib",
+    "build": "npm run clean && tsc --build && mv lib/index.js lib/index.mjs",
+    "prepare": "npm run build"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.191",
+    "@types/uuid": "^9.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.51.0",
+    "@typescript-eslint/parser": "^5.51.0",
+    "eslint": "^8.33.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-config-standard-with-typescript": "^34.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^15.6.1",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "prettier": "^2.8.4",
+    "typescript": "^4.9.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WunderbarNetwork/event-tracking-service.git"
+  },
+  "homepage": "https://github.com/WunderbarNetwork/event-tracking-service#readme"
+}
