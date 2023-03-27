@@ -9,7 +9,8 @@ import _ from "lodash";
  * Provides an interface towards the **Mini Digital Gateway**, to submit `AnalyticsEvent` objects.
  */
 export default class EventTrackingService {
-  protected _miniDigitalGateway: string;
+  /** URI of the Mini.Digital Gateway instance */
+  protected _miniDigitalGatewayUri: string;
 
   /** The User ID associated the service. Can be obtained and populated in `AnalyticsEvent` instances. */
   public userId: string;
@@ -25,12 +26,12 @@ export default class EventTrackingService {
       throw new Error("Invalid parameters provided to Event Tracking Service.");
     }
 
-    this._miniDigitalGateway = miniDigitalGatewayUri;
+    this._miniDigitalGatewayUri = miniDigitalGatewayUri;
     this.userId = userId;
 
     // The gateway should not end with a trailing slash
-    if (this._miniDigitalGateway.endsWith("/")) {
-      this._miniDigitalGateway = this._miniDigitalGateway.substring(0, this._miniDigitalGateway.length - 1);
+    if (this._miniDigitalGatewayUri.endsWith("/")) {
+      this._miniDigitalGatewayUri = this._miniDigitalGatewayUri.substring(0, this._miniDigitalGatewayUri.length - 1);
     }
   }
 
@@ -41,7 +42,7 @@ export default class EventTrackingService {
    * @param logResponse Optional - output to console when event has been successfully posted (default = false)
    */
   async postEvent(event: AnalyticsEvent, logResponse: boolean = false): Promise<void> {
-    const response = await fetch(`${this._miniDigitalGateway}/events/${event.eventId}`, {
+    const response = await fetch(`${this._miniDigitalGatewayUri}/events/${event.eventId}`, {
       method: "POST",
       headers: {
         Accept: "application/json",

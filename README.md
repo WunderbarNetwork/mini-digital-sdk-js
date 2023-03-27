@@ -1,6 +1,6 @@
-# @wunderbar-network/event-tracking-service
+# @wunderbar-network/mini-digital-sdk
 
-Shared library that provides an interface for Event Tracking using the Mini Digital Gateway to Vue applications.
+Shared library that provides an interface for Event Tracking using the **Mini Digital Gateway** to Vue/Node.js applications.
 
 ## Usage
 
@@ -10,7 +10,7 @@ Add the following to your `package.json`:
 {
   // ...
   "dependencies": {
-    "@wunderbar-network/event-tracking-service": "git+ssh://git@github.com:WunderbarNetwork/event-tracking-service.git",
+    "@wunderbar-network/mini-digital-sdk": "git+ssh://git@github.com:WunderbarNetwork/mini-digital-sdk.git",
   },
   // ...
 }
@@ -21,6 +21,6 @@ You can also include a specific branch by doing `repo.git#branch-name` at the en
 You can then import classes and types directly into your project like so:
 
 ```ts
-import { EventTrackingService } from "@wunderbar-network/event-tracking-service";
-import type { AnalyticsEvent } from "@wunderbar-network/event-tracking-service";
+import { EventTrackingService } from "@wunderbar-network/mini-digital-sdk";
+import type { AnalyticsEvent } from "@wunderbar-network/mini-digital-sdk";
 ```
