@@ -1,46 +1,59 @@
 {
-  "name": "@wunderbar-network/mini-digital-sdk",
+  "name": "@wunderbar-network/mini-digital-sdk-js",
   "version": "0.1.0",
-  "description": "Event Tracking Service for Vue/Node.js applications, to send events to the Mini.Digital gateway",
+  "description": "Event Tracking Service for back-end (Node) and front-end (JS) applications, to send events to the Mini.Digital ingress API",
   "private": true,
   "exports": {
     ".": {
-      "types": "./lib/types/index.d.ts",
-      "import": "./lib/index.mjs"
+      "types": "./lib/node/types/index.d.ts",
+      "import": "./lib/node/index.mjs"
+    },
+    "./browser": {
+      "require": "./lib/browser/mini-digital-sdk.cjs.js",
+      "import": "./lib/browser/mini-digital-sdk.esm.js"
     }
   },
   "type": "module",
-  "types": "./lib/types/index.d.ts",
+  "types": "lib/node/types/index.d.ts",
+  "main": "lib/node/index.mjs",
+  "module": "lib/browser/mini-digital-sdk.esm.js",
+  "browser": "lib/browser/mini-digital-sdk.esm.js",
   "files": [
     "lib/**/*"
   ],
   "scripts": {
     "clean": "rm -rf ./lib",
-    "build": "npm run clean && tsc --build && mv lib/index.js lib/index.mjs",
-    "prepare": "npm run build"
+    "build": "npm run clean && tsc --build && mv lib/node/index.js lib/node/index.mjs && npm run rollup",
+    "prepare": "npm run build",
+    "rollup": "rollup -c"
   },
   "dependencies": {
     "lodash": "^4.17.21",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^24.0.1",
+    "@rollup/plugin-json": "^6.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.2",
     "@types/lodash": "^4.14.192",
     "@types/uuid": "^9.0.1",
-    "@typescript-eslint/eslint-plugin": "^5.57.0",
-    "@typescript-eslint/parser": "^5.57.0",
-    "eslint": "^8.36.0",
+    "@typescript-eslint/eslint-plugin": "^5.58.0",
+    "@typescript-eslint/parser": "^5.58.0",
+    "eslint": "^8.38.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-config-standard-with-typescript": "^34.0.1",
     "eslint-plugin-import": "^2.27.5",
-    "eslint-plugin-n": "^15.6.1",
+    "eslint-plugin-n": "^15.7.0",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-promise": "^6.1.1",
     "prettier": "^2.8.7",
-    "typescript": "^5.0.2"
+    "rollup": "^3.20.2",
+    "rollup-plugin-terser": "^7.0.2",
+    "typescript": "^5.0.4"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/WunderbarNetwork/mini-digital-sdk.git"
+    "url": "git+https://github.com/WunderbarNetwork/mini-digital-sdk-js.git"
   },
-  "homepage": "https://github.com/WunderbarNetwork/mini-digital-sdk#readme"
+  "homepage": "https://github.com/WunderbarNetwork/mini-digital-sdk-js#readme"
 }

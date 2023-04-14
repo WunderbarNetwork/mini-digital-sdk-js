@@ -17,13 +17,13 @@ export function getEventTimestamp(): string {
 /**
  * Return the user agent from the browser
  */
-export function getUserAgent(): string {
+export function getBrowserUserAgent(): string {
   return window.navigator.userAgent;
 }
 
 /**
  * Return the local time zone from the browser, in the format e.g. "Pacific/Auckland"
  */
-export function getUserLocalTimeZone(): string {
+export function getBrowserUserLocalTimeZone(): string {
   return Intl.DateTimeFormat().resolvedOptions().timeZone;
 }
