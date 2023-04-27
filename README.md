@@ -1,6 +1,6 @@
 # @wunderbar-network/mini-digital-sdk-js
 
-Shared library that provides an interface for Event Tracking using the **Mini Digital Ingress** to Node or browser-based TS/JS implementations.
+Shared library that provides an interface for Event Tracking using the **Mini Digital Events API** to Node or browser-based TS/JS implementations.
 
 ## Usage
 
@@ -23,8 +23,8 @@ You can also include a specific branch by doing `repo.git#branch-name` at the en
 You can then import classes and types directly into your project like so:
 
 ```ts
-import { EventTrackingService, EventTrackingUtil } from "@wunderbar-network/event-tracking-service";
-import type { AnalyticsEvent } from "@wunderbar-network/event-tracking-service";
+import { EventTrackingService, EventTrackingUtil } from "@wunderbar-network/mini-digital-sdk-js";
+import type { AnalyticsEvent } from "@wunderbar-network/mini-digital-sdk-js";
 ```
 
 The `EventTrackingUtil` class has many methods that could make capturing some of the fields for the `AnalyticsEvent` easier.
@@ -32,3 +32,16 @@ The `EventTrackingUtil` class has many methods that could make capturing some of
 ### Browser
 
 If you are capturing events from the browser and want a browser-friendly build, this can be found in the `lib/browser` folder.
+
+The `EventTrackingUtil` class has several methods which can obtain browser information (such as the local timezone, referrer, etc).
+
+### Mini Digital URL
+
+If you wish to override the default Mini Digital URL (to point to e.g. a testing instance), you can do so by overriding the config namespace variable:
+
+```ts
+import { EventTrackingConfig } from "@wunderbar-network/mini-digital-sdk-js";
+
+// Override the default value
+EventTrackingConfig.miniDigitalUrl = "https://test.api.mini.digital/";
+```

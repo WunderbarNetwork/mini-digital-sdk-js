@@ -1,5 +1,7 @@
 import type { AnalyticsEvent } from "./types/AnalyticsEvent.js";
-import EventTrackingService from "./services/EventTrackingService.js";
+import { config as EventTrackingConfig } from "./util/Config.js";
+
+import * as EventTrackingService from "./services/EventTrackingService.js";
 import * as EventTrackingUtil from "./util/Util.js";
 
-export { type AnalyticsEvent, EventTrackingService, EventTrackingUtil };
+export { type AnalyticsEvent, EventTrackingService, EventTrackingConfig, EventTrackingUtil };
