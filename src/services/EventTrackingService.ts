@@ -21,14 +21,19 @@ export async function postEvent(event: AnalyticsEvent, logResponse: boolean = fa
     miniDigitalUrl = miniDigitalUrl.substring(0, miniDigitalUrl.length - 1);
   }
 
-  const response = await fetch(`${miniDigitalUrl}/events/${event.eventId}`, {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(event),
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${miniDigitalUrl}/events/${event.eventId}`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(event),
+    });
+  } catch (error: any) {
+    throw new Error("Error interfacing with Mini Digital.");
+  }
 
   if (!response.ok) {
     throw new Error(`Mini Digital POST error! Status: ${response.status}`);
