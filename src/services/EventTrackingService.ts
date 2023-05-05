@@ -83,9 +83,8 @@ async function postEventJwt(
     }
   }
 
-  const responseBody = await response.json();
-
   try {
+    const responseBody = await response.json();
     const serviceResponse: ServiceResponse = {
       message: responseBody.message,
       statusCode: response.status,
@@ -131,9 +130,8 @@ async function postEventApiKey(event: AnalyticsEvent, miniDigitalUrl: string, lo
     throw new Error(`Mini Digital POST error! Status: ${response.status}`);
   }
 
-  const responseBody = await response.json();
-
   try {
+    const responseBody = await response.json();
     const serviceResponse: ServiceResponse = {
       message: responseBody.message,
       statusCode: response.status,
