@@ -6,4 +6,4 @@ export const config = {
 };
 
 /** The (name &) version to identify this SDK */
-export const SDK_VERSION: string = "mini-digital-sdk-js-v0.2.0";
+export const SDK_VERSION: string = "mini-digital-sdk-js-v1.0.0";
