@@ -76,7 +76,7 @@ function eventEnrichment(event: ConsumerAnalyticsEvent): AnalyticsEvent {
     additionalIdentifiers: {
       ...event.additionalIdentifiers,
     },
-    anonymousUser: isAnonymous ? 1 : 0,
+    anonymousUser: isAnonymous ? "1" : "0",
     timestamp: Util.generateEventTimestamp(),
     eventProperties: {
       ...event.eventProperties,

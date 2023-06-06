@@ -27,7 +27,7 @@ export interface AnalyticsEvent {
   /** Optional: Any additional identifiers, in the form `{[ identifierName: identifierValue ]}` */
   additionalIdentifiers?: any;
   /** If the user is an anonymous user (1 = true, 0 = false) */
-  anonymousUser: number;
+  anonymousUser: string;
   /** The version of this SDK */
   sdkVersion: string;
   /** The version of the Mini Digital core schema */
