@@ -1,7 +1,10 @@
-import type { AnalyticsEvent } from "../types/AnalyticsEvent.js";
+import { type AnalyticsEvent, SCHEMA_VERSION } from "../types/AnalyticsEvent.js";
+import type { ConsumerAnalyticsEvent } from "../types/ConsumerAnalyticsEvent.js";
 import type { ServiceResponse } from "../types/ServiceResponse.js";
 
-import { config } from "../util/Config.js";
+import { config, SDK_VERSION } from "../util/Config.js";
+
+import * as Util from "../util/Util.js";
 
 /** JWT Auth token obtained from Mini Digital */
 let jwtAuthorizationToken: string | undefined;
@@ -20,7 +23,7 @@ const isStringNullOrEmpty = (test: string | null | undefined): boolean => {
  * @param event Event to be stored
  * @param logResponse Optional - output to console when event has been successfully posted (default = false)
  */
-export async function postEvent(event: AnalyticsEvent, logResponse: boolean = false): Promise<void> {
+export async function postEvent(event: ConsumerAnalyticsEvent, logResponse: boolean = false): Promise<void> {
   let miniDigitalUrl: string = config.miniDigitalUrl;
 
   if (isStringNullOrEmpty(miniDigitalUrl)) {
@@ -32,9 +35,12 @@ export async function postEvent(event: AnalyticsEvent, logResponse: boolean = fa
     miniDigitalUrl = miniDigitalUrl.substring(0, miniDigitalUrl.length - 1);
   }
 
+  // Enrich the event with additional fields, before submitting to the remote endpoint
+  const analyticsEvent = eventEnrichment(event);
+
   if (isBrowser) {
     // Running from within a browser, use JWT
-    const response = await postEventJwt(event, false, miniDigitalUrl, logResponse);
+    const response = await postEventJwt(analyticsEvent, false, miniDigitalUrl, logResponse);
 
     // If all good, we're done here
     if (response.statusCode === 200) return;
@@ -42,12 +48,50 @@ export async function postEvent(event: AnalyticsEvent, logResponse: boolean = fa
     // If we get a 401, the JWT token is either missing or has expired, so try again
     if (response.statusCode === 401 && !isStringNullOrEmpty(response.authorizationToken)) {
       jwtAuthorizationToken = response.authorizationToken;
-      await postEventJwt(event, true, miniDigitalUrl, logResponse);
+      await postEventJwt(analyticsEvent, true, miniDigitalUrl, logResponse);
     }
   } else {
     // Running from within Node.js, use API Keys
-    await postEventApiKey(event, miniDigitalUrl, logResponse);
+    await postEventApiKey(analyticsEvent, miniDigitalUrl, logResponse);
   }
+}
+
+function eventEnrichment(event: ConsumerAnalyticsEvent): AnalyticsEvent {
+  // TODO: Read from cookie
+  const trackingId: string = Util.generateAnonymousUserId();
+
+  // A user is anonymous if the primary identifier field is omitted.
+  const isAnonymous: boolean = !isStringNullOrEmpty(event.primaryIdentifier);
+
+  const analyticsEvent: AnalyticsEvent = {
+    eventId: Util.generateEventId(),
+    eventName: event.eventName,
+    eventCategory: event.eventCategory,
+    eventSource: event.eventSource,
+    entityId: event.entityId,
+    entityType: event.entityType,
+    action: event.action,
+    trackingId,
+    primaryIdentifier: event.primaryIdentifier ?? trackingId,
+    additionalIdentifiers: {
+      ...event.additionalIdentifiers,
+    },
+    anonymousUser: isAnonymous ? 1 : 0,
+    timestamp: Util.generateEventTimestamp(),
+    eventProperties: {
+      ...event.eventProperties,
+    },
+    sdkVersion: SDK_VERSION,
+    schemaVersion: SCHEMA_VERSION,
+  };
+
+  // Include additional properties if the SDK is used from within a browser
+  if (isBrowser) {
+    analyticsEvent.eventProperties.userAgent = Util.getBrowserUserAgent();
+    analyticsEvent.eventProperties.localTimezone = Util.getBrowserUserLocalTimeZone();
+  }
+
+  return analyticsEvent;
 }
 
 /**
