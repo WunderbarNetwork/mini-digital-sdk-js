@@ -4,3 +4,6 @@ export const config = {
   /** Default value for the Mini Digital Event Ingress URL, can be customized if needed */
   miniDigitalUrl: "https://api.mini.digital",
 };
+
+/** The (name &) version to identify this SDK */
+export const SDK_VERSION: string = "mini-digital-sdk-js-v1.0.0";

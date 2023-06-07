@@ -8,14 +8,6 @@ export interface AnalyticsEvent {
   eventName: string;
   /** Timestamp is ISO format */
   timestamp: string;
-  /** ID of the contract to validate the event schema against */
-  contractId: string;
-  /** Version of the contract to validate the event schema against */
-  contractVersion: string;
-  /** User ID of the user performing the action (e.g. SS58 Polkadot wallet address, DID, or bespoke to service) */
-  userId: string;
-  /** Optional: Id of the author of the event (if different from the user id) */
-  authorId?: string;
   /** Event category */
   eventCategory: "screen_view_event" | "user_outcome_event" | "system_outcome_event" | "content_event" | "interaction_event";
   /** Optional: Id of the entity this event relates to (e.g. CID of an IPFS resource) */
@@ -28,4 +20,19 @@ export interface AnalyticsEvent {
   eventSource: string;
   /** Any additional arbitrary JSON properties to attach to the event */
   eventProperties?: any;
+  /** Mini Digital Tracking ID */
+  trackingId: string;
+  /** Primary identifier of the user (distinct ID, wallet address, DID, etc.) If anonymous, same as `trackingId`. */
+  primaryIdentifier: string;
+  /** Optional: Any additional identifiers, in the form `{[ identifierName: identifierValue ]}` */
+  additionalIdentifiers?: any;
+  /** If the user is an anonymous user (1 = true, 0 = false) */
+  anonymousUser: string;
+  /** The version of this SDK */
+  sdkVersion: string;
+  /** The version of the Mini Digital core schema */
+  schemaVersion: string;
 }
+
+/** The (core) schema version that corresponds to this `AnalyticsEvent` type */
+export const SCHEMA_VERSION: string = "1.0.0";
