@@ -1,6 +1,6 @@
 {
   "name": "@wunderbar-network/mini-digital-sdk-js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Event Tracking Service for back-end (Node) and front-end (JS) applications, to send events to the Mini.Digital ingress API",
   "private": true,
   "exports": {

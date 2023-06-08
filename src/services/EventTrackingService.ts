@@ -112,7 +112,7 @@ async function postEventJwt(
     if (!isStringNullOrEmpty(jwtAuthorizationToken)) {
       headers.Authorization = jwtAuthorizationToken ?? "";
     }
-    response = await fetch(`${miniDigitalUrl}/events/jwt/${event.eventId}`, {
+    response = await fetch(`${miniDigitalUrl}/events/jwt/v1/${event.eventId}`, {
       method: "POST",
       headers,
       body: JSON.stringify(event),
@@ -157,7 +157,7 @@ async function postEventApiKey(event: AnalyticsEvent, miniDigitalUrl: string, lo
 
   let response: Response;
   try {
-    response = await fetch(`${miniDigitalUrl}/events/key/${event.eventId}`, {
+    response = await fetch(`${miniDigitalUrl}/events/key/v1/${event.eventId}`, {
       method: "POST",
       headers: {
         Accept: "application/json",
