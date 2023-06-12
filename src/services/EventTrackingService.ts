@@ -4,6 +4,7 @@ import type { ServiceResponse } from "../types/ServiceResponse.js";
 
 import { config, SDK_VERSION } from "../util/Config.js";
 
+import Cookies from "js-cookie";
 import * as Util from "../util/Util.js";
 
 /** JWT Auth token obtained from Mini Digital */
@@ -16,6 +17,8 @@ const isBrowser: boolean = typeof window !== "undefined" && typeof window.docume
 const isStringNullOrEmpty = (test: string | null | undefined): boolean => {
   return test === null || test === undefined || test.trim().length === 0;
 };
+
+const maxAge = 24 * 60 * 60; // Token expiration time in seconds
 
 /**
  * Provides an interface towards the **Mini Digital Event API**, to submit `AnalyticsEvent` objects.
@@ -48,6 +51,15 @@ export async function postEvent(event: ConsumerAnalyticsEvent, logResponse: bool
     // If we get a 401, the JWT token is either missing or has expired, so try again
     if (response.statusCode === 401 && !isStringNullOrEmpty(response.authorizationToken)) {
       jwtAuthorizationToken = response.authorizationToken;
+
+      if (!isStringNullOrEmpty(jwtAuthorizationToken) && jwtAuthorizationToken !== undefined) {
+        Cookies.set("jwtAuthorizationToken", jwtAuthorizationToken, {
+          expires: maxAge,
+          secure: true,
+          sameSite: "strict",
+        });
+      }
+
       await postEventJwt(analyticsEvent, true, miniDigitalUrl, logResponse);
     }
   } else {
@@ -57,8 +69,22 @@ export async function postEvent(event: ConsumerAnalyticsEvent, logResponse: bool
 }
 
 function eventEnrichment(event: ConsumerAnalyticsEvent): AnalyticsEvent {
-  // TODO: Read from cookie
-  const trackingId: string = Util.generateAnonymousUserId();
+  let trackingId: string | undefined;
+
+  if (isBrowser) {
+    jwtAuthorizationToken = Cookies.get("jwtAuthorizationToken");
+    trackingId = Cookies.get("trackingId");
+
+    if (isStringNullOrEmpty(trackingId)) {
+      trackingId = Util.generateAnonymousUserId();
+
+      Cookies.set("trackingId", trackingId, {
+        expires: maxAge,
+        secure: true,
+        sameSite: "strict",
+      });
+    }
+  }
 
   // A user is anonymous if the primary identifier field is omitted.
   const isAnonymous: boolean = !isStringNullOrEmpty(event.primaryIdentifier);
@@ -71,8 +97,8 @@ function eventEnrichment(event: ConsumerAnalyticsEvent): AnalyticsEvent {
     entityId: event.entityId,
     entityType: event.entityType,
     action: event.action,
-    trackingId,
-    primaryIdentifier: event.primaryIdentifier ?? trackingId,
+    trackingId: trackingId ?? "", // TODO
+    primaryIdentifier: event.primaryIdentifier ?? "", // TODO
     additionalIdentifiers: {
       ...event.additionalIdentifiers,
     },

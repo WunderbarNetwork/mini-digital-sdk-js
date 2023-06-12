@@ -5,5 +5,5 @@ export const config = {
   miniDigitalUrl: "https://api.mini.digital",
 };
 
-/** The (name &) version to identify this SDK */
-export const SDK_VERSION: string = "mini-digital-sdk-js-v1.0.1";
+/** The name & version to identify this SDK */
+export const SDK_VERSION: string = "mini-digital-sdk-js-v__BUILD_PACKAGE_VERSION__";
