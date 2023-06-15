@@ -1,7 +1,31 @@
-export const config = {
-  /** The API Key to send to Mini Digital, if using API Key Authentication */
-  apiKey: "",
-  /** Default value for the Mini Digital Event Ingress URL, can be customized if needed */
+interface MiniDigitalConfig {
+  /**
+   * The API Key to send to Mini Digital, if using API Key Authentication.
+   */
+  apiKey?: string;
+  /**
+   * The domain under which cookies will be stored. If empty, defaults to domain of the current page.
+   * To store a cookie under all subdomains, use the following syntax: `.example.com`.
+   */
+  cookieDomain?: string;
+  /**
+   * Expiration of the Cookie storing the JWT token (in seconds). Default = 1 day.
+   */
+  cookieJwtTokenExpiration: number;
+  /**
+   * Expiration of the Cookie storing the tracking Id (in seconds). Default = 30 days.
+   */
+  cookieTrackingIdExpiration: number;
+  /**
+   * Default value for the Mini Digital Event Ingress URL, can be customized if needed.
+   */
+  miniDigitalUrl: string;
+}
+
+/** Mini Digital Config */
+export const config: MiniDigitalConfig = {
+  cookieJwtTokenExpiration: 60 * 60 * 24,
+  cookieTrackingIdExpiration: 60 * 60 * 24 * 30,
   miniDigitalUrl: "https://api.mini.digital",
 };
 
