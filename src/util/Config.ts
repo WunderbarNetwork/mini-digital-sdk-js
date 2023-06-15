@@ -31,3 +31,9 @@ export const config: MiniDigitalConfig = {
 
 /** The name & version to identify this SDK */
 export const SDK_VERSION: string = "mini-digital-sdk-js-v__BUILD_PACKAGE_VERSION__";
+
+/** The name of the cookie which stores the trackingId */
+export const COOKIE_NAME_TRACKING_ID: string = "MINI_DIGITAL_TRACKING_ID";
+
+/** The name of the cookie which stores the JWT Authorization Token */
+export const COOKIE_NAME_JWT_TOKEN: string = "MINI_DIGITAL_JWT_TOKEN";

@@ -1,7 +1,7 @@
 import { type AnalyticsEvent } from "../types/AnalyticsEvent.js";
 import { type EnrichedAnalyticsEvent, SCHEMA_VERSION } from "../types/EnrichedAnalyticsEvent.js";
 
-import { config, SDK_VERSION } from "../util/Config.js";
+import { config, COOKIE_NAME_TRACKING_ID, SDK_VERSION } from "../util/Config.js";
 import { generateAnonymousUserId } from "../util/ConsumerUtil.js";
 
 import * as Util from "../util/Util.js";
@@ -62,13 +62,13 @@ function determineIdentifiers(
   // Check the trackingId
   if (isBrowser) {
     // Event from the browser, check if the tracking ID has been stored previously
-    trackingId = Cookies.get("trackingId");
+    trackingId = Cookies.get(COOKIE_NAME_TRACKING_ID);
 
     if (Util.isStringNullOrEmpty(trackingId)) {
       trackingId = generateAnonymousUserId();
 
       // Save the tracking ID into a cookie
-      Cookies.set("trackingId", trackingId, {
+      Cookies.set(COOKIE_NAME_TRACKING_ID, trackingId, {
         domain: !Util.isStringNullOrEmpty(config.cookieDomain) ? config.cookieDomain : undefined,
         expires: config.cookieTrackingIdExpiration,
         secure: true,

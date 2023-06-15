@@ -2,7 +2,7 @@ import { type AnalyticsEvent } from "../types/AnalyticsEvent.js";
 import { type EnrichedAnalyticsEvent } from "../types/EnrichedAnalyticsEvent.js";
 import { type ServiceResponse } from "../types/ServiceResponse.js";
 
-import { config } from "../util/Config.js";
+import { COOKIE_NAME_JWT_TOKEN, config } from "../util/Config.js";
 import { isStringNullOrEmpty } from "../util/Util.js";
 
 import eventEnrichment from "./EventEnrichmentService.js";
@@ -38,7 +38,7 @@ export async function postEvent(event: AnalyticsEvent, logResponse: boolean = fa
 
   if (isBrowser) {
     // Check if a cookie exist with a jwtAuthorizationToken
-    jwtAuthorizationToken = Cookies.get("jwtAuthorizationToken");
+    jwtAuthorizationToken = Cookies.get(COOKIE_NAME_JWT_TOKEN);
 
     // Running from within a browser, use JWT
     const response = await postEventJwt(analyticsEvent, false, miniDigitalUrl, logResponse);
@@ -51,7 +51,7 @@ export async function postEvent(event: AnalyticsEvent, logResponse: boolean = fa
       jwtAuthorizationToken = response.authorizationToken;
 
       if (!isStringNullOrEmpty(jwtAuthorizationToken) && jwtAuthorizationToken !== undefined) {
-        Cookies.set("jwtAuthorizationToken", jwtAuthorizationToken, {
+        Cookies.set(COOKIE_NAME_JWT_TOKEN, jwtAuthorizationToken, {
           domain: !isStringNullOrEmpty(config.cookieDomain) ? config.cookieDomain : undefined,
           expires: config.cookieJwtTokenExpiration,
           secure: true,
