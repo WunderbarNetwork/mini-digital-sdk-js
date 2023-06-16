@@ -60,7 +60,7 @@ export interface AnalyticsEvent {
    * - localTimezone - the local time zone from the browser, in the format e.g. "Pacific/Auckland"
    * - currentPage - the full URL from which the event was captured
    * - screenWidth and screenHeight - obtained from the browser
-   * - referrer - the document referrer
+   * - referrer - the document referrer (only if {@link eventCategory} is `screen_view_event` or `content_event`)
    *
    * Any of these fields can be overwritten with a custom value if specified before the event is passed to the SDK.
    */

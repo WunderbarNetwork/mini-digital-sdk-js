@@ -37,10 +37,30 @@ export default function eventEnrichment(event: AnalyticsEvent, isBrowser: boolea
     schemaVersion: SCHEMA_VERSION,
   };
 
-  // Include additional properties if the SDK is used from within a browser
+  // Include additional properties if the SDK is used from within a browser.
+  // If the property of the same name was already included, then skip that property (even if it is null).
   if (isBrowser) {
-    analyticsEvent.eventProperties.userAgent = Util.getBrowserUserAgent();
-    analyticsEvent.eventProperties.localTimezone = Util.getBrowserUserLocalTimeZone();
+    if (analyticsEvent.eventProperties.userAgent === undefined) {
+      analyticsEvent.eventProperties.userAgent = Util.getBrowserUserAgent();
+    }
+    if (analyticsEvent.eventProperties.localTimezone === undefined) {
+      analyticsEvent.eventProperties.localTimezone = Util.getBrowserUserLocalTimeZone();
+    }
+    if (analyticsEvent.eventProperties.referrer === undefined) {
+      // Referrer is added only for specific event types
+      if (analyticsEvent.eventCategory === "screen_view_event" || analyticsEvent.eventCategory === "content_event") {
+        analyticsEvent.eventProperties.referrer = Util.getBrowserReferrer();
+      }
+    }
+    if (analyticsEvent.eventProperties.currentPage === undefined) {
+      analyticsEvent.eventProperties.currentPage = Util.getBrowserCurrentPage();
+    }
+    if (analyticsEvent.eventProperties.screenWidth === undefined) {
+      analyticsEvent.eventProperties.screenWidth = Util.getBrowserWindowScreenWidth();
+    }
+    if (analyticsEvent.eventProperties.screenHeight === undefined) {
+      analyticsEvent.eventProperties.screenHeight = Util.getBrowserWindowScreenHeight();
+    }
   }
 
   return analyticsEvent;
@@ -53,18 +73,18 @@ function determineIdentifiers(
   event: AnalyticsEvent,
   isBrowser: boolean
 ): { primaryIdentifier: string; trackingId: string; isAnonymous: boolean } {
-  /** Tracking ID will only be set if the event comes from the browser, and is not part of the "consumer" event schema */
   let trackingId: string | undefined;
-
-  let primaryIdentifier = event.primaryIdentifier;
-  let isAnonymous = event.anonymousUser;
+  let primaryIdentifier: string | undefined = event.primaryIdentifier;
+  let isAnonymous: boolean | undefined = event.anonymousUser;
 
   // Check the trackingId
+  // Tracking ID will only be set if the event comes from the browser, and is not part of the "consumer" `AnalyticsEvent` schema
   if (isBrowser) {
     // Event from the browser, check if the tracking ID has been stored previously
     trackingId = Cookies.get(COOKIE_NAME_TRACKING_ID);
 
     if (Util.isStringNullOrEmpty(trackingId)) {
+      // No previous tracking ID, generate a random UUID
       trackingId = generateAnonymousUserId();
 
       // Save the tracking ID into a cookie

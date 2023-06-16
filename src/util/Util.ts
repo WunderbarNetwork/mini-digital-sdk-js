@@ -41,3 +41,24 @@ export function getBrowserUserLocalTimeZone(): string {
 export function getBrowserReferrer(): string {
   return document.referrer;
 }
+
+/**
+ * Return the current page of the browser
+ */
+export function getBrowserCurrentPage(): string {
+  return window.location.href;
+}
+
+/**
+ * Get the screen width of the window from the browser
+ */
+export function getBrowserWindowScreenWidth(): number {
+  return window.screen.width;
+}
+
+/**
+ * Get the screen height of the window from the browser
+ */
+export function getBrowserWindowScreenHeight(): number {
+  return window.screen.height;
+}
