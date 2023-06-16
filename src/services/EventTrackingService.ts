@@ -1,10 +1,13 @@
-import { type AnalyticsEvent, SCHEMA_VERSION } from "../types/AnalyticsEvent.js";
-import type { ConsumerAnalyticsEvent } from "../types/ConsumerAnalyticsEvent.js";
-import type { ServiceResponse } from "../types/ServiceResponse.js";
+import { type AnalyticsEvent } from "../types/AnalyticsEvent.js";
+import { type EnrichedAnalyticsEvent } from "../types/EnrichedAnalyticsEvent.js";
+import { type ServiceResponse } from "../types/ServiceResponse.js";
 
-import { config, SDK_VERSION } from "../util/Config.js";
+import { COOKIE_NAME_JWT_TOKEN, config } from "../util/Config.js";
+import { isStringNullOrEmpty } from "../util/Util.js";
 
-import * as Util from "../util/Util.js";
+import eventEnrichment from "./EventEnrichmentService.js";
+
+import Cookies from "js-cookie";
 
 /** JWT Auth token obtained from Mini Digital */
 let jwtAuthorizationToken: string | undefined;
@@ -12,18 +15,13 @@ let jwtAuthorizationToken: string | undefined;
 /** Determine if the SDK is running inside a browser (uses JWT authentication) or Node.js (uses API Key authentication). */
 const isBrowser: boolean = typeof window !== "undefined" && typeof window.document !== "undefined";
 
-/** Check if the `test` string has a value defined */
-const isStringNullOrEmpty = (test: string | null | undefined): boolean => {
-  return test === null || test === undefined || test.trim().length === 0;
-};
-
 /**
  * Provides an interface towards the **Mini Digital Event API**, to submit `AnalyticsEvent` objects.
  *
  * @param event Event to be stored
  * @param logResponse Optional - output to console when event has been successfully posted (default = false)
  */
-export async function postEvent(event: ConsumerAnalyticsEvent, logResponse: boolean = false): Promise<void> {
+export async function postEvent(event: AnalyticsEvent, logResponse: boolean = false): Promise<void> {
   let miniDigitalUrl: string = config.miniDigitalUrl;
 
   if (isStringNullOrEmpty(miniDigitalUrl)) {
@@ -36,9 +34,12 @@ export async function postEvent(event: ConsumerAnalyticsEvent, logResponse: bool
   }
 
   // Enrich the event with additional fields, before submitting to the remote endpoint
-  const analyticsEvent = eventEnrichment(event);
+  const analyticsEvent = eventEnrichment(event, isBrowser);
 
   if (isBrowser) {
+    // Check if a cookie exist with a jwtAuthorizationToken
+    jwtAuthorizationToken = Cookies.get(COOKIE_NAME_JWT_TOKEN);
+
     // Running from within a browser, use JWT
     const response = await postEventJwt(analyticsEvent, false, miniDigitalUrl, logResponse);
 
@@ -48,6 +49,16 @@ export async function postEvent(event: ConsumerAnalyticsEvent, logResponse: bool
     // If we get a 401, the JWT token is either missing or has expired, so try again
     if (response.statusCode === 401 && !isStringNullOrEmpty(response.authorizationToken)) {
       jwtAuthorizationToken = response.authorizationToken;
+
+      if (!isStringNullOrEmpty(jwtAuthorizationToken) && jwtAuthorizationToken !== undefined) {
+        Cookies.set(COOKIE_NAME_JWT_TOKEN, jwtAuthorizationToken, {
+          domain: !isStringNullOrEmpty(config.cookieDomain) ? config.cookieDomain : undefined,
+          expires: config.cookieJwtTokenExpiration,
+          secure: true,
+          sameSite: "strict",
+        });
+      }
+
       await postEventJwt(analyticsEvent, true, miniDigitalUrl, logResponse);
     }
   } else {
@@ -56,49 +67,11 @@ export async function postEvent(event: ConsumerAnalyticsEvent, logResponse: bool
   }
 }
 
-function eventEnrichment(event: ConsumerAnalyticsEvent): AnalyticsEvent {
-  // TODO: Read from cookie
-  const trackingId: string = Util.generateAnonymousUserId();
-
-  // A user is anonymous if the primary identifier field is omitted.
-  const isAnonymous: boolean = !isStringNullOrEmpty(event.primaryIdentifier);
-
-  const analyticsEvent: AnalyticsEvent = {
-    eventId: Util.generateEventId(),
-    eventName: event.eventName,
-    eventCategory: event.eventCategory,
-    eventSource: event.eventSource,
-    entityId: event.entityId,
-    entityType: event.entityType,
-    action: event.action,
-    trackingId,
-    primaryIdentifier: event.primaryIdentifier ?? trackingId,
-    additionalIdentifiers: {
-      ...event.additionalIdentifiers,
-    },
-    anonymousUser: isAnonymous ? "1" : "0",
-    timestamp: Util.generateEventTimestamp(),
-    eventProperties: {
-      ...event.eventProperties,
-    },
-    sdkVersion: SDK_VERSION,
-    schemaVersion: SCHEMA_VERSION,
-  };
-
-  // Include additional properties if the SDK is used from within a browser
-  if (isBrowser) {
-    analyticsEvent.eventProperties.userAgent = Util.getBrowserUserAgent();
-    analyticsEvent.eventProperties.localTimezone = Util.getBrowserUserLocalTimeZone();
-  }
-
-  return analyticsEvent;
-}
-
 /**
  * Posts an event using the JWT Authentication
  */
 async function postEventJwt(
-  event: AnalyticsEvent,
+  event: EnrichedAnalyticsEvent,
   forceErrorOn401: boolean,
   miniDigitalUrl: string,
   logResponse: boolean
@@ -109,8 +82,8 @@ async function postEventJwt(
       Accept: "application/json",
       "Content-Type": "application/json",
     };
-    if (!isStringNullOrEmpty(jwtAuthorizationToken)) {
-      headers.Authorization = jwtAuthorizationToken ?? "";
+    if (!isStringNullOrEmpty(jwtAuthorizationToken) && jwtAuthorizationToken !== undefined) {
+      headers.Authorization = jwtAuthorizationToken;
     }
     response = await fetch(`${miniDigitalUrl}/events/jwt/v1/${event.eventId}`, {
       method: "POST",
@@ -148,10 +121,10 @@ async function postEventJwt(
 /**
  * Posts an event using the API Key Authentication
  */
-async function postEventApiKey(event: AnalyticsEvent, miniDigitalUrl: string, logResponse: boolean): Promise<ServiceResponse> {
+async function postEventApiKey(event: EnrichedAnalyticsEvent, miniDigitalUrl: string, logResponse: boolean): Promise<ServiceResponse> {
   const apiKey = config.apiKey;
 
-  if (isStringNullOrEmpty(apiKey)) {
+  if (isStringNullOrEmpty(apiKey) || apiKey === undefined) {
     throw new Error("The API Key is not set in config.");
   }
 

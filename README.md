@@ -12,13 +12,13 @@ Add the following to your `package.json`:
 {
   // ...
   "dependencies": {
-    "@wunderbar-network/mini-digital-sdk-js": "git+ssh://git@github.com:WunderbarNetwork/mini-digital-sdk-js.git",
+    "@wunderbar-network/mini-digital-sdk-js": "https://github.com/WunderbarNetwork/mini-digital-sdk-js.git",
   },
   // ...
 }
 ```
 
-You can also include a specific branch by doing `repo.git#branch-name` at the end.
+You can also include a specific branch by doing `repo.git#branch-name` at the end (e.g. `#v1.1.0`).
 
 You can then import classes and types directly into your project like so:
 
@@ -27,13 +27,11 @@ import { EventTrackingService, EventTrackingUtil } from "@wunderbar-network/mini
 import type { AnalyticsEvent } from "@wunderbar-network/mini-digital-sdk-js";
 ```
 
-The `EventTrackingUtil` class has many methods that could make capturing some of the fields for the `AnalyticsEvent` easier.
+The `EventTrackingUtil` class has methods that could make capturing some of the fields for the `AnalyticsEvent` easier.
 
 ### Browser
 
 If you are capturing events from the browser and want a browser-friendly build, this can be found in the `lib/browser` folder.
-
-The `EventTrackingUtil` class has several methods which can obtain browser information (such as the local timezone, referrer, etc).
 
 ### Mini Digital URL
 
