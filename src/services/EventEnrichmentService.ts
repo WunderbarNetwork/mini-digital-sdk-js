@@ -78,7 +78,7 @@ function determineIdentifiers(
   let isAnonymous: boolean | undefined = event.anonymousUser;
 
   // Check the trackingId
-  // Tracking ID will only be set if the event comes from the browser, and is not part of the "consumer" `AnalyticsEvent` schema
+  // Tracking ID will only be stored if the event comes from the browser, and is not part of the "consumer" `AnalyticsEvent` schema
   if (isBrowser) {
     // Event from the browser, check if the tracking ID has been stored previously
     trackingId = Cookies.get(COOKIE_NAME_TRACKING_ID);
@@ -113,6 +113,11 @@ function determineIdentifiers(
     if (isAnonymous === undefined) {
       isAnonymous = false;
     }
+  }
+
+  // The primaryIdentifier & isAnonymous are now set. If this is NOT a browser event, update trackingId to match.
+  if (!isBrowser) {
+    trackingId = primaryIdentifier;
   }
 
   // At this point, all of them should be set.
