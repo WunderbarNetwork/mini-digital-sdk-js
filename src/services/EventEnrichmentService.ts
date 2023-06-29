@@ -81,12 +81,14 @@ function determineIdentifiers(
   // Tracking ID will only be stored if the event comes from the browser, and is not part of the "consumer" `AnalyticsEvent` schema
   if (isBrowser) {
     // Event from the browser, check if the tracking ID has been stored previously
-    trackingId = Cookies.get(COOKIE_NAME_TRACKING_ID);
+    trackingId = config.useCookies ? Cookies.get(COOKIE_NAME_TRACKING_ID) : undefined;
 
     if (Util.isStringNullOrEmpty(trackingId)) {
       // No previous tracking ID, generate a random UUID
       trackingId = generateAnonymousUserId();
+    }
 
+    if (config.useCookies && trackingId !== undefined) {
       // Save the tracking ID into a cookie
       Cookies.set(COOKIE_NAME_TRACKING_ID, trackingId, {
         domain: !Util.isStringNullOrEmpty(config.cookieDomain) ? config.cookieDomain : undefined,
