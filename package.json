@@ -2,7 +2,6 @@
   "name": "@wunderbar-network/mini-digital-sdk",
   "version": "1.2.0",
   "description": "Event Tracking Service for back-end (Node) and front-end (JS) applications, to send analytics events to Mini.Digital",
-  "private": true,
   "exports": {
     ".": {
       "types": "./lib/node/types/index.d.ts",
