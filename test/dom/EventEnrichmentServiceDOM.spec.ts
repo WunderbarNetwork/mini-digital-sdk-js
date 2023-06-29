@@ -12,9 +12,11 @@ import { getError, NoErrorThrownError } from "../util/testUtils.js";
 
 import { VALID_EVENT, PRIMARY_IDENTIFIER_SET } from "../factories/EventFactory";
 
+const IS_BROWSER: boolean = true;
+
 describe(`Testing the EventEnrichmentService using Node`, () => {
   it("Attaches additional properties to the event", async () => {
-    const enrichedEvent = eventEnrichment(VALID_EVENT, true);
+    const enrichedEvent = eventEnrichment(VALID_EVENT, IS_BROWSER);
 
     expect(isStringNullOrEmpty(enrichedEvent.eventId)).not.toBeTruthy();
     expect(isStringNullOrEmpty(enrichedEvent.trackingId)).not.toBeTruthy();
@@ -45,7 +47,7 @@ describe(`Testing the EventEnrichmentService using Node`, () => {
     event.eventProperties.screenWidth = 1;
     event.eventProperties.screenHeight = 2;
 
-    const enrichedEvent = eventEnrichment(event, true);
+    const enrichedEvent = eventEnrichment(event, IS_BROWSER);
 
     // Browser-specific
     expect(enrichedEvent.eventProperties.userAgent).toMatch("TEST1");
@@ -58,7 +60,7 @@ describe(`Testing the EventEnrichmentService using Node`, () => {
   });
 
   it("Sets identifiers properly (anonymous user = true)", async () => {
-    const enrichedEvent = eventEnrichment(VALID_EVENT, true);
+    const enrichedEvent = eventEnrichment(VALID_EVENT, IS_BROWSER);
 
     expect(isStringNullOrEmpty(enrichedEvent.trackingId)).not.toBeTruthy();
     expect(isStringNullOrEmpty(enrichedEvent.primaryIdentifier)).not.toBeTruthy();
@@ -67,7 +69,7 @@ describe(`Testing the EventEnrichmentService using Node`, () => {
   });
 
   it("Sets identifiers properly (anonymous user = false)", async () => {
-    const enrichedEvent = eventEnrichment(PRIMARY_IDENTIFIER_SET, true);
+    const enrichedEvent = eventEnrichment(PRIMARY_IDENTIFIER_SET, IS_BROWSER);
 
     expect(isStringNullOrEmpty(enrichedEvent.trackingId)).not.toBeTruthy();
     expect(isStringNullOrEmpty(enrichedEvent.primaryIdentifier)).not.toBeTruthy();
@@ -78,7 +80,7 @@ describe(`Testing the EventEnrichmentService using Node`, () => {
     const event = PRIMARY_IDENTIFIER_SET;
     event.anonymousUser = undefined;
 
-    const enrichedEvent = eventEnrichment(event, true);
+    const enrichedEvent = eventEnrichment(event, IS_BROWSER);
 
     expect(isStringNullOrEmpty(enrichedEvent.trackingId)).not.toBeTruthy();
     expect(isStringNullOrEmpty(enrichedEvent.primaryIdentifier)).not.toBeTruthy();
@@ -90,7 +92,7 @@ describe(`Testing the EventEnrichmentService using Node`, () => {
     event.anonymousUser = undefined;
 
     const error = await getError<Error>(async () => {
-      eventEnrichment(event, true);
+      eventEnrichment(event, IS_BROWSER);
     });
 
     expect(error).not.toBeInstanceOf(NoErrorThrownError);
@@ -102,7 +104,7 @@ describe(`Testing the EventEnrichmentService using Node`, () => {
     event.anonymousUser = false;
 
     const error = await getError<Error>(async () => {
-      eventEnrichment(event, true);
+      eventEnrichment(event, IS_BROWSER);
     });
 
     expect(error).not.toBeInstanceOf(NoErrorThrownError);
