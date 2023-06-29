@@ -1,45 +1,66 @@
-# @wunderbar-network/mini-digital-sdk-js
+# @wunderbar-network/mini-digital-sdk
 
-Shared library that provides an interface for Event Tracking using the **Mini Digital Events API** to Node or browser-based TS/JS implementations.
+Library that provides an interface to capture analytics events, and send them to [Mini Digital](https://mini.digital). This library can be used in either Node.js or browser-based TypeScript/JavaScript implementations (including frameworks like React or Vue).
 
-## Usage
+## Installation
 
-### Node.js
+To install the library, you can use npm or yarn. Run the following command:
 
-Add the following to your `package.json`:
-
-```json
-{
-  // ...
-  "dependencies": {
-    "@wunderbar-network/mini-digital-sdk-js": "https://github.com/WunderbarNetwork/mini-digital-sdk-js.git",
-  },
-  // ...
-}
+```shell
+npm install @wunderbar-network/mini-digital-sdk
 ```
 
-You can also include a specific branch by doing `repo.git#branch-name` at the end (e.g. `#v1.1.0`).
+or
 
-You can then import classes and types directly into your project like so:
-
-```ts
-import { EventTrackingService, EventTrackingUtil } from "@wunderbar-network/mini-digital-sdk-js";
-import type { AnalyticsEvent } from "@wunderbar-network/mini-digital-sdk-js";
+```shell
+yarn add @wunderbar-network/mini-digital-sdk
 ```
 
-The `EventTrackingUtil` class has methods that could make capturing some of the fields for the `AnalyticsEvent` easier.
+### Usage
 
-### Browser
-
-If you are capturing events from the browser and want a browser-friendly build, this can be found in the `lib/browser` folder.
-
-### Mini Digital URL
-
-If you wish to override the default Mini Digital URL (to point to e.g. a testing instance), you can do so by overriding the config namespace variable:
+To send a quick event using the Mini Digital SDK, do the following:
 
 ```ts
-import { EventTrackingConfig } from "@wunderbar-network/mini-digital-sdk-js";
+// Import the library
+import { type AnalyticsEvent, EventTrackingService } from "@wunderbar-network/mini-digital-sdk";
+
+// Declare event
+const event: AnalyticsEvent = {
+  eventName: "my_first_mini_digital_event",
+  eventCategory: "system_outcome_event",
+  eventSource: "MyProject.EventTestingPlayground",
+  anonymousUser: true,
+};
+
+// Send event!
+EventTrackingService.postEvent(event);
+```
+
+See our API reference to get a deeper understanding of the event schema.
+
+### Browser builds
+
+If you want a browser-friendly build to use directly into your HTML code, browser builds (CJS/ESM) can be found in the `lib/browser` folder.
+
+### Config
+
+By default, the config is set to send events to the production Mini Digital endpoint. If you wish to override the default Mini Digital URL (to point to e.g. a testing instance), you can do so by overriding the config namespace variable:
+
+```ts
+import { EventTrackingConfig } from "@wunderbar-network/mini-digital-sdk";
 
 // Override the default value
-EventTrackingConfig.miniDigitalUrl = "https://test.api.mini.digital/";
+EventTrackingConfig.miniDigitalUrl = "http://localhost:1234/";
 ```
+
+You can also choose to _pause_ sending events (e.g. in your test suites), or not use cookies (to store anonymous tracking IDs):
+
+```ts
+import { EventTrackingConfig } from "@wunderbar-network/mini-digital-sdk";
+
+// Override the default value
+EventTrackingConfig.pauseTracking = true;
+EventTrackingConfig.useCookies = false;
+```
+
+See our API reference for the full list of configuration options.
