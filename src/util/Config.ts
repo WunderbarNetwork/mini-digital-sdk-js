@@ -9,24 +9,35 @@ interface MiniDigitalConfig {
    */
   cookieDomain?: string;
   /**
-   * Expiration of the Cookie storing the JWT token (in seconds). Default = 1 day.
+   * Expiration of the Cookie storing the JWT token (in days). Default = 1 day.
    */
   cookieJwtTokenExpiration: number;
   /**
-   * Expiration of the Cookie storing the tracking Id (in seconds). Default = 30 days.
+   * Expiration of the Cookie storing the tracking Id (in days). Default = 30 days.
    */
   cookieTrackingIdExpiration: number;
   /**
    * Default value for the Mini Digital Event Ingress URL, can be customized if needed.
    */
   miniDigitalUrl: string;
+  /**
+   * Set to `true` to temporarily pause tracking (sending events to the server)
+   */
+  pauseTracking: boolean;
+  /**
+   * Set to `false` to turn off storing a Mini Digital Tracking ID into a secure cookie.
+   * This will limit the ability to link events performed by anonymous (non logged-in) users.
+   */
+  useCookies: boolean;
 }
 
 /** Mini Digital Config */
 export const config: MiniDigitalConfig = {
-  cookieJwtTokenExpiration: 60 * 60 * 24,
-  cookieTrackingIdExpiration: 60 * 60 * 24 * 30,
+  cookieJwtTokenExpiration: 1,
+  cookieTrackingIdExpiration: 30,
   miniDigitalUrl: "https://api.mini.digital",
+  pauseTracking: false,
+  useCookies: true,
 };
 
 /** The name & version to identify this SDK */

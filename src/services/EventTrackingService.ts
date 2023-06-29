@@ -22,6 +22,8 @@ const isBrowser: boolean = typeof window !== "undefined" && typeof window.docume
  * @param logResponse Optional - output to console when event has been successfully posted (default = false)
  */
 export async function postEvent(event: AnalyticsEvent, logResponse: boolean = false): Promise<void> {
+  if (config.pauseTracking) return;
+
   let miniDigitalUrl: string = config.miniDigitalUrl;
 
   if (isStringNullOrEmpty(miniDigitalUrl)) {
@@ -38,7 +40,7 @@ export async function postEvent(event: AnalyticsEvent, logResponse: boolean = fa
 
   if (isBrowser) {
     // Check if a cookie exist with a jwtAuthorizationToken
-    jwtAuthorizationToken = Cookies.get(COOKIE_NAME_JWT_TOKEN);
+    jwtAuthorizationToken = config.useCookies ? Cookies.get(COOKIE_NAME_JWT_TOKEN) : undefined;
 
     // Running from within a browser, use JWT
     const response = await postEventJwt(analyticsEvent, false, miniDigitalUrl, logResponse);
@@ -50,7 +52,7 @@ export async function postEvent(event: AnalyticsEvent, logResponse: boolean = fa
     if (response.statusCode === 401 && !isStringNullOrEmpty(response.authorizationToken)) {
       jwtAuthorizationToken = response.authorizationToken;
 
-      if (!isStringNullOrEmpty(jwtAuthorizationToken) && jwtAuthorizationToken !== undefined) {
+      if (config.useCookies && !isStringNullOrEmpty(jwtAuthorizationToken) && jwtAuthorizationToken !== undefined) {
         Cookies.set(COOKIE_NAME_JWT_TOKEN, jwtAuthorizationToken, {
           domain: !isStringNullOrEmpty(config.cookieDomain) ? config.cookieDomain : undefined,
           expires: config.cookieJwtTokenExpiration,
@@ -94,8 +96,10 @@ async function postEventJwt(
     throw new Error("Error interfacing with Mini Digital.");
   }
 
+  const responseAuthorizationToken = response.headers.get("Authorization");
+
   if (!response.ok) {
-    if (response.status !== 401 || (response.status === 401 && forceErrorOn401)) {
+    if (response.status !== 401 || (response.status === 401 && (isStringNullOrEmpty(responseAuthorizationToken) || forceErrorOn401))) {
       throw new Error(`Mini Digital POST error! Status: ${response.status}`);
     }
   }
@@ -105,7 +109,7 @@ async function postEventJwt(
     const serviceResponse: ServiceResponse = {
       message: responseBody.message,
       statusCode: response.status,
-      authorizationToken: response.headers.get("Authorization") ?? undefined,
+      authorizationToken: responseAuthorizationToken ?? undefined,
     };
 
     if (logResponse) {
