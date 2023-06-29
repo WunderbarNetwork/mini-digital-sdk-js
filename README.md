@@ -50,7 +50,7 @@ By default, the config is set to send events to the production Mini Digital endp
 import { EventTrackingConfig } from "@wunderbar-network/mini-digital-sdk";
 
 // Override the default value
-EventTrackingConfig.miniDigitalUrl = "http://localhost:1234/";
+EventTrackingConfig.miniDigitalUrl = "http://localhost:3333/";
 ```
 
 You can also choose to _pause_ sending events (e.g. in your test suites), or not use cookies (to store anonymous tracking IDs):
