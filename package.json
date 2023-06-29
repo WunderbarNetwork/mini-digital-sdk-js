@@ -27,7 +27,7 @@
     "build:node": "npm run clean && tsc --build && mv lib/node/index.js lib/node/index.mjs && node post-build.js",
     "build:browser": "rollup -c",
     "prepare": "npm run build",
-    "test": "vitest",
+    "test": "vitest run",
     "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --ignore-path .gitignore"
   },
   "dependencies": {
@@ -39,6 +39,7 @@
     "@rollup/plugin-node-resolve": "^15.1.0",
     "@rollup/plugin-terser": "^0.4.3",
     "@types/js-cookie": "^3.0.3",
+    "@types/jsdom": "^21.1.1",
     "@types/uuid": "^9.0.2",
     "@typescript-eslint/eslint-plugin": "^5.60.0",
     "@typescript-eslint/parser": "^5.60.0",
