@@ -1,7 +1,7 @@
 {
   "name": "@wunderbar-network/mini-digital-sdk",
-  "version": "1.2.0",
-  "description": "Event Tracking Service for back-end (Node) and front-end (JS) applications, to send analytics events to Mini.Digital",
+  "version": "1.2.1",
+  "description": "SDK for back-end (Node) and front-end (TypeScript/JavaScript) applications, to send analytics events to Mini.Digital",
   "exports": {
     ".": {
       "types": "./lib/node/types/index.d.ts",
@@ -17,9 +17,6 @@
   "main": "lib/node/index.mjs",
   "module": "lib/browser/mini-digital-sdk.esm.js",
   "browser": "lib/browser/mini-digital-sdk.esm.js",
-  "files": [
-    "lib/**/*"
-  ],
   "scripts": {
     "clean": "rm -rf ./lib",
     "build": "npm run build:node && npm run build:browser",
@@ -69,8 +66,22 @@
   "directories": {
     "lib": "lib"
   },
+  "files": [
+    "lib/**/*"
+  ],
   "contributors": [
     "Miloš Ranđelović <milos@randelovic.me>"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "keywords": [
+    "Analytics",
+    "Insights",
+    "SDK",
+    "Product Analytics",
+    "Event Tracking",
+    "Event Collection",
+    "Mini.Digital",
+    "Integration",
+    "Tracking Library"
+  ]
 }
