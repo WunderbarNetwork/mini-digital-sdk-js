@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from "fs";
 
 const packageJson = readFileSync("package.json", "utf8");
-const version = JSON.parse(packageJson).version;
+const version = String(JSON.parse(packageJson).version);
 
 const filePath = "lib/node/util/Config.js";
 const fileContent = readFileSync(filePath, "utf8");
