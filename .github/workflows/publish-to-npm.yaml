@@ -1,0 +1,35 @@
+name: Publish to NPM
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          registry-url: https://registry.npmjs.org/
+          scope: '@wunderbar-network'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn --network-concurrency 8 || yarn --check-files --cache-folder .ycache && rm -rf .ycache
+
+      - name: Publish to NPM
+        run: |
+              yarn config set '//registry.npmjs.org/:_authToken' "${NPMJS_ACCESS_TOKEN}"
+              yarn publish --verbose --access public --tag ${{ env.RELEASE_TAG }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPMJS_ACCESS_TOKEN }}

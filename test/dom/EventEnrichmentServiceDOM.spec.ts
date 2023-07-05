@@ -10,7 +10,7 @@ import * as config from "../../src/util/Config";
 
 import { getError, NoErrorThrownError } from "../util/testUtils.js";
 
-import { VALID_EVENT, PRIMARY_IDENTIFIER_SET } from "../factories/EventFactory";
+import { VALID_EVENT, PRIMARY_IDENTIFIER_SET } from "../util/EventFactory";
 
 const IS_BROWSER: boolean = true;
 

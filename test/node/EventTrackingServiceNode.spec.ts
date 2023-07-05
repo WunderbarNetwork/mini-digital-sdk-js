@@ -2,24 +2,39 @@ import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
 import createFetchMock from "vitest-fetch-mock";
 
-import { VALID_EVENT } from "../factories/EventFactory.js";
-import { getError, NoErrorThrownError } from "../util/testUtils.js";
+import { VALID_EVENT } from "../util/EventFactory.js";
+import { describeRequest, getError, NoErrorThrownError } from "../util/testUtils.js";
 
-import { EventTrackingConfig, EventTrackingService } from "../../src/index.js";
+import { EventTrackingConfig, EventTrackingService, HttpError } from "../../src/index.js";
 
-import { API_KEY, NOT_FOUND_MINI_DIGITAL_RESPONSE, VALID_MINI_DIGITAL_RESPONSE } from "../util/constants.js";
+import {
+  API_KEY,
+  BAD_REQUEST_MINI_DIGITAL_RESPONSE,
+  INTERNAL_SERVER_ERROR_MINI_DIGITAL_RESPONSE,
+  VALID_MINI_DIGITAL_RESPONSE,
+} from "../util/constants.js";
 
 const fetchMocker = createFetchMock(vi);
+
+// Use console logs while testing. Could be an env variable in the future.
+const logOutcomes: boolean = false;
 
 describe(`Testing the EventTrackingService using Node`, () => {
   beforeAll(() => {
     // sets globalThis.fetch and globalThis.fetchMock to our mocked version
     fetchMocker.enableMocks();
+
+    // Set initial config overrides
+    EventTrackingConfig.apiKey = API_KEY; // Runs in a Node (non-browser) environment, API key is required
+    EventTrackingConfig.errorRetryIntervalMs = 1; // Set the retries interval to 1ms
+    EventTrackingConfig.miniDigitalUrl = "http://localhost:3333"; // Default port for Mini Digital Event Sink
   });
 
   afterEach(() => {
-    // Reset config
-    EventTrackingConfig.apiKey = undefined;
+    // Reset config to test defaults
+    EventTrackingConfig.apiKey = API_KEY; // Runs in a Node (non-browser) environment, API key is required
+    EventTrackingConfig.maxRetriesOn500 = 3;
+    EventTrackingConfig.miniDigitalUrl = "http://localhost:3333"; // Default port for Mini Digital Event Sink
     EventTrackingConfig.pauseTracking = false;
 
     // Reset mocks
@@ -27,10 +42,8 @@ describe(`Testing the EventTrackingService using Node`, () => {
   });
 
   it("Receives 200 OK for a valid event using an API Key", async () => {
-    // Runs in a Node (non-browser) environment, API key is required
-    EventTrackingConfig.apiKey = API_KEY;
-
     fetchMocker.once((request) => {
+      describeRequest(request, logOutcomes);
       return {
         status: 200,
         headers: [["Content-Type", "application/json"]],
@@ -38,17 +51,163 @@ describe(`Testing the EventTrackingService using Node`, () => {
       };
     });
 
-    await EventTrackingService.postEvent(VALID_EVENT);
+    await EventTrackingService.postEvent(VALID_EVENT, logOutcomes);
+
+    expect(fetchMocker.requests().length).toEqual(1);
   });
 
   it("Fails when no API Key is provided", async () => {
+    // Set config
+    EventTrackingConfig.apiKey = undefined;
+
+    fetchMocker.once((request) => {
+      describeRequest(request, logOutcomes);
+      throw new HttpError("Fetch should not be called", 400);
+    });
+
     const error = await getError<Error>(async () => {
-      await EventTrackingService.postEvent(VALID_EVENT);
+      await EventTrackingService.postEvent(VALID_EVENT, logOutcomes);
     });
 
     // check that the returned error wasn't that no error was thrown
     expect(error).not.toBeInstanceOf(NoErrorThrownError);
+    expect(error).not.toBeInstanceOf(HttpError);
+    expect(fetchMocker.requests().length).toEqual(0);
     expect(error.message).toEqual("The API Key is not set in config.");
+  });
+
+  it("Fails on user error (Bad Request, 400)", async () => {
+    fetchMocker.once((request) => {
+      describeRequest(request, logOutcomes);
+      return {
+        status: 400,
+        headers: [["Content-Type", "application/json"]],
+        body: JSON.stringify(BAD_REQUEST_MINI_DIGITAL_RESPONSE),
+      };
+    });
+
+    // Runs in a Node (non-browser) environment
+    const error = await getError<Error>(async () => {
+      await EventTrackingService.postEvent(VALID_EVENT, logOutcomes);
+    });
+
+    expect(error).not.toBeInstanceOf(NoErrorThrownError);
+    expect(error).toBeInstanceOf(HttpError);
+    expect(fetchMocker.requests().length).toEqual(1); // Does not retry on failure
+    expect(error.message).toEqual("Mini Digital POST error! Status: 400");
+  });
+
+  it("Fails after 5 retries on 500 errors", async () => {
+    // Set config to retry 5 times
+    EventTrackingConfig.maxRetriesOn500 = 5;
+
+    fetchMocker.doMock((request) => {
+      describeRequest(request, logOutcomes);
+      return {
+        status: 500,
+        headers: [["Content-Type", "application/json"]],
+        body: JSON.stringify(INTERNAL_SERVER_ERROR_MINI_DIGITAL_RESPONSE),
+      };
+    });
+
+    // Runs in a Node (non-browser) environment
+    const error = await getError<Error>(async () => {
+      await EventTrackingService.postEvent(VALID_EVENT, logOutcomes);
+    });
+
+    expect(error).not.toBeInstanceOf(NoErrorThrownError);
+    expect(error).toBeInstanceOf(HttpError);
+    expect(fetchMocker.requests().length).toEqual(6); // Original call + 5 retries
+    expect(error.message).toEqual("Mini Digital POST error! Status: 500");
+  });
+
+  it("Retry succeeds after error 500", async () => {
+    // Set config to retry once
+    EventTrackingConfig.maxRetriesOn500 = 1;
+
+    // First request
+    fetchMocker.once((request) => {
+      describeRequest(request, logOutcomes);
+      return {
+        status: 500,
+        headers: [["Content-Type", "application/json"]],
+        body: JSON.stringify(INTERNAL_SERVER_ERROR_MINI_DIGITAL_RESPONSE),
+      };
+    });
+
+    // Second request
+    fetchMocker.once((request) => {
+      describeRequest(request, logOutcomes);
+      return {
+        status: 200,
+        headers: [["Content-Type", "application/json"]],
+        body: JSON.stringify(VALID_MINI_DIGITAL_RESPONSE),
+      };
+    });
+
+    // Runs in a Node (non-browser) environment
+    const error = await getError<Error>(async () => {
+      await EventTrackingService.postEvent(VALID_EVENT, logOutcomes);
+    });
+
+    expect(error).toBeInstanceOf(NoErrorThrownError);
+    expect(error).not.toBeInstanceOf(HttpError);
+    expect(fetchMocker.requests().length).toEqual(2); // Original call + retry
+  });
+
+  it("Fails to parse a bad response from Mini Digital", async () => {
+    fetchMocker.once((request) => {
+      describeRequest(request, logOutcomes);
+      return {
+        status: 200,
+        body: undefined,
+      };
+    });
+
+    // Runs in a Node (non-browser) environment
+    const error = await getError<Error>(async () => {
+      await EventTrackingService.postEvent(VALID_EVENT, logOutcomes);
+    });
+
+    expect(error).not.toBeInstanceOf(NoErrorThrownError);
+    expect(fetchMocker.requests().length).toEqual(1); // Does not retry on failure
+    expect(error.message).toEqual("Could not parse the Mini Digital response.");
+  });
+
+  it("Fails if the Mini Digital endpoint is not defined", async () => {
+    // Set config
+    EventTrackingConfig.miniDigitalUrl = "";
+
+    fetchMocker.once((request) => {
+      describeRequest(request, logOutcomes);
+      throw new HttpError("Fetch should not be called", 400);
+    });
+
+    // Runs in a Node (non-browser) environment
+    const error = await getError<Error>(async () => {
+      await EventTrackingService.postEvent(VALID_EVENT, logOutcomes);
+    });
+
+    expect(error).not.toBeInstanceOf(NoErrorThrownError);
+    expect(error).not.toBeInstanceOf(HttpError);
+    expect(fetchMocker.requests().length).toEqual(0);
+    expect(error.message).toEqual("The Mini Digital URL has not been defined in the config.");
+  });
+
+  it("Fails when the fetch request throws an exception", async () => {
+    fetchMocker.once((request) => {
+      describeRequest(request, logOutcomes);
+      throw new Error("Simulating fetch throwing an error");
+    });
+
+    // Runs in a Node (non-browser) environment
+    const error = await getError<Error>(async () => {
+      await EventTrackingService.postEvent(VALID_EVENT, logOutcomes);
+    });
+
+    expect(error).not.toBeInstanceOf(NoErrorThrownError);
+    expect(fetchMocker.requests().length).toEqual(1); // Does not retry on failure
+    expect(error.message).toEqual("Error interfacing with Mini Digital.");
   });
 
   it("Doesn't send a request when config.pauseTracking is true", async () => {
@@ -56,14 +215,13 @@ describe(`Testing the EventTrackingService using Node`, () => {
     EventTrackingConfig.pauseTracking = true;
 
     fetchMocker.once((request) => {
-      return {
-        status: 404,
-        headers: [["Content-Type", "application/json"]],
-        body: JSON.stringify(NOT_FOUND_MINI_DIGITAL_RESPONSE),
-      };
+      describeRequest(request, logOutcomes);
+      throw new HttpError("Fetch should not be called", 400);
     });
 
     // No error should be thrown
-    await EventTrackingService.postEvent(VALID_EVENT);
+    await EventTrackingService.postEvent(VALID_EVENT, logOutcomes);
+
+    expect(fetchMocker.requests().length).toEqual(0);
   });
 });

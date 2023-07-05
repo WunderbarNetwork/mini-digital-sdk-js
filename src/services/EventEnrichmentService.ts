@@ -92,7 +92,7 @@ function determineIdentifiers(
       // Save the tracking ID into a cookie
       Cookies.set(COOKIE_NAME_TRACKING_ID, trackingId, {
         domain: !Util.isStringNullOrEmpty(config.cookieDomain) ? config.cookieDomain : undefined,
-        expires: config.cookieTrackingIdExpiration,
+        expires: config.cookieTrackingIdExpirationDays,
         secure: true,
         sameSite: "strict",
       });
