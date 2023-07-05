@@ -17,7 +17,7 @@ import {
 const fetchMocker = createFetchMock(vi);
 
 // Use console logs while testing. Could be an env variable in the future.
-const logOutcomes: boolean = true;
+const logOutcomes: boolean = false;
 
 describe(`Testing the EventTrackingService using Node`, () => {
   beforeAll(() => {
