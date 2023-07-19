@@ -32,7 +32,7 @@ jobs:
 
       - name: Install Google Cloud SDK
         run: |
-          curl https://sdk.cloud.google.com | bash -s --disable-bq-component
+          curl https://sdk.cloud.google.com | bash
           exec -l $SHELL
 
       - name: Create Service Account Key File
