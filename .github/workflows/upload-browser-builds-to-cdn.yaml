@@ -1,8 +1,9 @@
 name: Upload browser builds to CDN
 
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - "small-fixes"
 
 jobs:
   upload:
