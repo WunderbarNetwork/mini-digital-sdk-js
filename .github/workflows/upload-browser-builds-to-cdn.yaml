@@ -67,4 +67,4 @@ jobs:
       - name: Rename and Upload to Google Cloud Storage
         run: |
           VERSION=${{ steps.extract-version.outputs.version }}
-          gsutil cp /lib/browser/* gs://${{ secrets.GCS_BUCKET_NAME }}/mini-digital-sdk.v${VERSION}/
+          gsutil cp $GITHUB_WORKSPACE/lib/browser/* gs://${{ secrets.GCS_BUCKET_NAME }}/mini-digital-sdk.v${VERSION}/
