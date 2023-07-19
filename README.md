@@ -1,5 +1,7 @@
 # @wunderbar-network/mini-digital-sdk
 
+[![CI](https://github.com/WunderbarNetwork/mini-digital-sdk-js/actions/workflows/ci.yaml/badge.svg)](https://github.com/WunderbarNetwork/mini-digital-sdk-js/actions/workflows/ci.yaml)
+
 Library that provides an interface to capture analytics events, and send them to [Mini Digital](https://mini.digital). This library can be used in either Node.js or browser-based TypeScript/JavaScript implementations (including frameworks like React or Vue).
 
 ## Installation
@@ -40,7 +42,7 @@ See our API reference to get a deeper understanding of the event schema.
 
 ### Browser builds
 
-If you want a browser-friendly build to use directly into your HTML code, browser builds (CJS/ESM) can be found in the `lib/browser` folder.
+If you want a browser-friendly build to use directly into your HTML code, browser builds (CJS/ESM/UMD) can be found in the `lib/browser` folder.
 
 ### Config
 
