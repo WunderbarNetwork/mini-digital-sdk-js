@@ -6,6 +6,7 @@ on:
 
 jobs:
   publish:
+    name: Build & publish to NPM
     runs-on: ubuntu-latest
 
     strategy:

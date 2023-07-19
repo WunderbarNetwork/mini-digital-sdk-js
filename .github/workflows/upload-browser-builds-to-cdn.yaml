@@ -1,0 +1,47 @@
+name: Upload browser builds to CDN
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  upload:
+    name: Upload Browser Builds to GCS
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Using Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn --network-concurrency 8 || yarn --check-files --cache-folder .ycache && rm -rf .ycache
+
+      - name: Install Google Cloud SDK
+        run: |
+          curl https://sdk.cloud.google.com | bash
+          exec -l $SHELL
+
+      - name: Authenticate with Google Cloud
+        run: gcloud auth activate-service-account --key-file=${{ secrets.GCP_SERVICE_ACCOUNT_CREDENTIALS }}
+
+      - name: Extract Version from package.json
+        id: extract-version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          MAJOR_MINOR_VERSION=$(echo $VERSION | cut -d '.' -f 1-2)
+          echo "::set-output name=version::$MAJOR_MINOR_VERSION"
+
+      - name: Rename and Upload to Google Cloud Storage
+        run: |
+          VERSION=${{ steps.extract-version.outputs.version }}
+          gsutil -m cp -r /lib/browser/* gs://${{ secrets.GCS_BUCKET_NAME }}/mini-digital-sdk.v${VERSION}/
