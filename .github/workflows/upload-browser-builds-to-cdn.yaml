@@ -75,9 +75,9 @@ jobs:
       - name: Upload Browser Build Files
         run: |
           VERSION=${{ steps.extract-version.outputs.version }}
-          gsutil cp -f $GITHUB_WORKSPACE/lib/browser/mini-digital-sdk.cjs.js gs://${{ secrets.GCS_BUCKET_NAME }}/mini-digital-sdk.v${VERSION}.cjs.js
-          gsutil cp -f $GITHUB_WORKSPACE/lib/browser/mini-digital-sdk.cjs.js.map gs://${{ secrets.GCS_BUCKET_NAME }}/mini-digital-sdk.v${VERSION}.cjs.js.map
-          gsutil cp -f $GITHUB_WORKSPACE/lib/browser/mini-digital-sdk.esm.js gs://${{ secrets.GCS_BUCKET_NAME }}/mini-digital-sdk.v${VERSION}.esm.js
-          gsutil cp -f $GITHUB_WORKSPACE/lib/browser/mini-digital-sdk.esm.js.map gs://${{ secrets.GCS_BUCKET_NAME }}/mini-digital-sdk.v${VERSION}.esm.js.map
-          gsutil cp -f $GITHUB_WORKSPACE/lib/browser/mini-digital-sdk.umd.js gs://${{ secrets.GCS_BUCKET_NAME }}/mini-digital-sdk.v${VERSION}.umd.js
-          gsutil cp -f $GITHUB_WORKSPACE/lib/browser/mini-digital-sdk.umd.js.map gs://${{ secrets.GCS_BUCKET_NAME }}/mini-digital-sdk.v${VERSION}.umd.js.map
+          gsutil cp $GITHUB_WORKSPACE/lib/browser/mini-digital-sdk.cjs.js gs://${{ secrets.GCS_BUCKET_NAME }}/mini-digital-sdk.v${VERSION}.cjs.js
+          gsutil cp $GITHUB_WORKSPACE/lib/browser/mini-digital-sdk.cjs.js.map gs://${{ secrets.GCS_BUCKET_NAME }}/mini-digital-sdk.v${VERSION}.cjs.js.map
+          gsutil cp $GITHUB_WORKSPACE/lib/browser/mini-digital-sdk.esm.js gs://${{ secrets.GCS_BUCKET_NAME }}/mini-digital-sdk.v${VERSION}.esm.js
+          gsutil cp $GITHUB_WORKSPACE/lib/browser/mini-digital-sdk.esm.js.map gs://${{ secrets.GCS_BUCKET_NAME }}/mini-digital-sdk.v${VERSION}.esm.js.map
+          gsutil cp $GITHUB_WORKSPACE/lib/browser/mini-digital-sdk.umd.js gs://${{ secrets.GCS_BUCKET_NAME }}/mini-digital-sdk.v${VERSION}.umd.js
+          gsutil cp $GITHUB_WORKSPACE/lib/browser/mini-digital-sdk.umd.js.map gs://${{ secrets.GCS_BUCKET_NAME }}/mini-digital-sdk.v${VERSION}.umd.js.map
