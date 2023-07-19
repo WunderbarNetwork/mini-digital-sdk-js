@@ -68,6 +68,21 @@ export default function eventEnrichment(event: AnalyticsEvent, isBrowser: boolea
 
 /**
  * Function to determine the primary identifier and tracking ID based on the set rules.
+ *
+ * Short rule-set:
+ * 1) When tracking **anonymous** users, always set `anonymousUser` to `true`.
+ * - if `primaryIdentifier` is omitted (recommended), it will be set to the same value as the trackingId (which will either be
+ *   generated or read from a cookie, if persisted previously and this is a browser event)
+ * - if `primaryIdentifier` is supplied, the SDK assumes this is also the trackingId, and will not use the one from the cookie
+ *   (if any is found).
+ *
+ * 2) When tracking **identifiable** users, always set the `primaryIdentifier` field and optionally `anonymousUser` to `false`.
+ * - if the `anonymousUser` field is omitted - it will automatically be set to `false`
+ * - if `anonymousUser` is set to `true`, the SDK will obviously assume it an anonymous user instead
+ *
+ * 3) It makes no sense to either:
+ * - have both `primaryIdentifier` and `anonymousUser` fields omitted - will throw an `Error`
+ * - have the `primaryIdentifier` omitted and `anonymousUser` set to `false` - will also throw an `Error`
  */
 function determineIdentifiers(
   event: AnalyticsEvent,
@@ -77,54 +92,73 @@ function determineIdentifiers(
   let primaryIdentifier: string | undefined = event.primaryIdentifier;
   let isAnonymous: boolean | undefined = event.anonymousUser;
 
-  // Check the trackingId
   // Tracking ID will only be stored if the event comes from the browser, and is not part of the "consumer" `AnalyticsEvent` schema
   if (isBrowser) {
     // Event from the browser, check if the tracking ID has been stored previously
     trackingId = config.useCookies ? Cookies.get(COOKIE_NAME_TRACKING_ID) : undefined;
+  }
 
-    if (Util.isStringNullOrEmpty(trackingId)) {
-      // No previous tracking ID, generate a random UUID
-      trackingId = generateAnonymousUserId();
-    }
-
-    if (config.useCookies && trackingId !== undefined) {
-      // Save the tracking ID into a cookie
-      Cookies.set(COOKIE_NAME_TRACKING_ID, trackingId, {
-        domain: !Util.isStringNullOrEmpty(config.cookieDomain) ? config.cookieDomain : undefined,
-        expires: config.cookieTrackingIdExpirationDays,
-        secure: true,
-        sameSite: "strict",
-      });
-    }
+  // If no previous trackingId was found... (i.e. either the cookie has expired, or cookies turned off, or this is NOT a browser event)
+  if (Util.isStringNullOrEmpty(trackingId)) {
+    // ... generate a random UUID
+    trackingId = generateAnonymousUserId();
   }
 
   // Check the primary identifier and isAnonymous
   if (Util.isStringNullOrEmpty(primaryIdentifier)) {
-    // Primary identifier not set, check anonymousUser
+    // ***************************
+    // Primary identifier not set!
+    // ***************************
+
+    // Check anonymousUser (it must be set explicitly to `true`, otherwise raise an Error)
     if (isAnonymous === undefined) {
-      throw new Error("Primary identifier is not set, anonymousUser field must be set instead. See the docs for further details.");
+      throw new Error("Primary identifier is not set, anonymousUser field must be set to true instead. See the docs for further details.");
     } else if (isAnonymous !== undefined && !isAnonymous) {
       throw new Error("Primary identifier is not set, anonymousUser field must not be false. See the docs for further details.");
     }
 
-    // Use the tracking ID if coming from the browser, otherwise use a new UUID
-    primaryIdentifier = isBrowser ? trackingId : generateAnonymousUserId();
+    // Given the primaryIdentifier is empty and at this point we ensured that anonymousUser is set to `true`, make the primaryIdentifier
+    // match the trackingId. The trackingId will potentially be read from a cookie (for browser events), or be made a new random UUID.
+    primaryIdentifier = trackingId;
   } else {
-    // Primary identifier is set, if anonymousUser is omitted, declare it non-anonymous
+    // **************************
+    // Primary identifier is set!
+    // **************************
+
+    // `anonymousUser` can be either `true` or `false` at this stage. If the field is omitted, declare it non-anonymous by default.
     if (isAnonymous === undefined) {
       isAnonymous = false;
     }
-  }
 
-  // The primaryIdentifier & isAnonymous are now set. If this is NOT a browser event, update trackingId to match.
-  if (!isBrowser) {
-    trackingId = primaryIdentifier;
+    // Next, check if we are within a browser.
+    //
+    // For browser events, set the trackingId to match the given primaryIdentifier only if `anonymousUser` is set to `true`. This is
+    // an edge case, if the consumer app essentially wishes to manage anonymous IDs manually. If `anonymousUser` is set to `false`,
+    // which is the default (assumed) value, the trackingId will remain as-is (either read from the cookie or a new random UUID value
+    // generated).
+    //
+    // For non-browser events, **always** set the trackingId to match the primaryIdentifier, as we have no other way to persist the
+    // trackingId anyway.
+    if (isBrowser && isAnonymous) {
+      trackingId = primaryIdentifier;
+    } else if (!isBrowser) {
+      trackingId = primaryIdentifier;
+    }
   }
 
   // At this point, all of them should be set.
   if (trackingId === undefined || primaryIdentifier === undefined || isAnonymous === undefined) {
     throw new Error("Unexpected state in the Mini Digital SDK: could not determine the identifiers.");
+  }
+
+  // If this is executed within a browser, update the cookie with the same (i.e. extend the expiration) or new trackingId
+  if (isBrowser && config.useCookies && trackingId !== undefined) {
+    Cookies.set(COOKIE_NAME_TRACKING_ID, trackingId, {
+      domain: !Util.isStringNullOrEmpty(config.cookieDomain) ? config.cookieDomain : undefined,
+      expires: config.cookieTrackingIdExpirationDays,
+      secure: true,
+      sameSite: "strict",
+    });
   }
 
   return { trackingId, primaryIdentifier, isAnonymous };

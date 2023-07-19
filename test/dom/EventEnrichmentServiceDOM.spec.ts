@@ -74,6 +74,7 @@ describe(`Testing the EventEnrichmentService using Node`, () => {
     expect(isStringNullOrEmpty(enrichedEvent.trackingId)).not.toBeTruthy();
     expect(isStringNullOrEmpty(enrichedEvent.primaryIdentifier)).not.toBeTruthy();
     expect(enrichedEvent.anonymousUser).toMatch("0");
+    expect(enrichedEvent.primaryIdentifier).not.toMatch(enrichedEvent.trackingId);
   });
 
   it("Sets identifiers properly (anonymous user = omitted, primary identifier set)", async () => {
@@ -85,6 +86,7 @@ describe(`Testing the EventEnrichmentService using Node`, () => {
     expect(isStringNullOrEmpty(enrichedEvent.trackingId)).not.toBeTruthy();
     expect(isStringNullOrEmpty(enrichedEvent.primaryIdentifier)).not.toBeTruthy();
     expect(enrichedEvent.anonymousUser).toMatch("0");
+    expect(enrichedEvent.primaryIdentifier).not.toMatch(enrichedEvent.trackingId);
   });
 
   it("Fails if primary identifier not set, isAnonymous = undefined", async () => {
