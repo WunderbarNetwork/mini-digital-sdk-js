@@ -24,12 +24,16 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'yarn'
 
-      - name: Install dependencies
+      - name: Install dependencies & build lib folder
         run: yarn --network-concurrency 8 || yarn --check-files --cache-folder .ycache && rm -rf .ycache
+
+      - name: Debug Browser Build Files
+        run: ls -la $GITHUB_WORKSPACE/lib/browser
 
       - name: Install Google Cloud SDK
         run: |
-          curl https://sdk.cloud.google.com | bash
+          export CLOUDSDK_PYTHON=python3  # Set Python3 as the Python interpreter
+          curl https://sdk.cloud.google.com | bash -s -- --disable-bq-component  # Exclude bq tool
           exec -l $SHELL
 
       - name: Create Service Account Key File
@@ -52,4 +56,4 @@ jobs:
       - name: Rename and Upload to Google Cloud Storage
         run: |
           VERSION=${{ steps.extract-version.outputs.version }}
-          gsutil -m cp -r /lib/browser/* gs://${{ secrets.GCS_BUCKET_NAME }}/mini-digital-sdk.v${VERSION}/
+          gsutil -m cp -r $GITHUB_WORKSPACE/lib/browser/* gs://${{ secrets.GCS_BUCKET_NAME }}/mini-digital-sdk.v${VERSION}/
