@@ -32,8 +32,15 @@ jobs:
           curl https://sdk.cloud.google.com | bash
           exec -l $SHELL
 
+      - name: Create Service Account Key File
+        id: create-key-file
+        run: |
+          echo "$GCP_CREDENTIALS" > /tmp/keyfile.json
+        env:
+          GCP_CREDENTIALS: ${{ secrets.GCP_SERVICE_ACCOUNT_CREDENTIALS }}
+
       - name: Authenticate with Google Cloud
-        run: gcloud auth activate-service-account --key-file=${{ secrets.GCP_SERVICE_ACCOUNT_CREDENTIALS }}
+        run: gcloud auth activate-service-account --key-file=/tmp/keyfile.json
 
       - name: Extract Version from package.json
         id: extract-version
