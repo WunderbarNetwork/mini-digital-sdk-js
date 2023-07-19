@@ -57,6 +57,9 @@ jobs:
       - name: Authenticate with Google Cloud
         run: gcloud auth activate-service-account --key-file=/tmp/keyfile.json
 
+      - name: Delete Temporary Key File
+        run: rm /tmp/keyfile.json
+
       - name: Extract Version from package.json
         id: extract-version
         run: |
@@ -68,3 +71,13 @@ jobs:
         run: |
           VERSION=${{ steps.extract-version.outputs.version }}
           gsutil cp $GITHUB_WORKSPACE/lib/browser/* gs://${{ secrets.GCS_BUCKET_NAME }}/mini-digital-sdk.v${VERSION}/
+
+      - name: Upload Browser Build Files
+        run: |
+          VERSION=${{ steps.extract-version.outputs.version }}
+          gsutil cp /lib/browser/mini-digital-sdk.cjs.js gs://${{ secrets.GCS_BUCKET_NAME }}/mini-digital-sdk.v${VERSION}.cjs.js
+          gsutil cp /lib/browser/mini-digital-sdk.cjs.js gs://${{ secrets.GCS_BUCKET_NAME }}/mini-digital-sdk.v${VERSION}.cjs.js.map
+          gsutil cp /lib/browser/mini-digital-sdk.esm.js gs://${{ secrets.GCS_BUCKET_NAME }}/mini-digital-sdk.v${VERSION}.esm.js
+          gsutil cp /lib/browser/mini-digital-sdk.esm.js gs://${{ secrets.GCS_BUCKET_NAME }}/mini-digital-sdk.v${VERSION}.esm.js.map
+          gsutil cp /lib/browser/mini-digital-sdk.umd.js gs://${{ secrets.GCS_BUCKET_NAME }}/mini-digital-sdk.v${VERSION}.umd.js
+          gsutil cp /lib/browser/mini-digital-sdk.umd.js gs://${{ secrets.GCS_BUCKET_NAME }}/mini-digital-sdk.v${VERSION}.umd.js.map
