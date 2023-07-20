@@ -55,6 +55,9 @@
     "vitest": "^0.33.0",
     "vitest-fetch-mock": "^0.2.2"
   },
+  "resolutions": {
+    "semver":  "^7.5.4"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/WunderbarNetwork/mini-digital-sdk-js.git"
