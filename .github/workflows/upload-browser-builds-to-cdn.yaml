@@ -1,9 +1,8 @@
 name: Upload browser builds to CDN
 
 on:
-  push:
-    branches:
-      - "small-fixes"
+  release:
+    types: [published]
 
 jobs:
   upload:
@@ -71,4 +70,4 @@ jobs:
       - name: Upload Browser Build Files
         run: |
           VERSION=${{ steps.extract-version.outputs.version }}
-          gsutil -m cp -r $GITHUB_WORKSPACE/lib/browser/* gs://${{ secrets.GCS_BUCKET_NAME }}/v${VERSION}/
+          gsutil -m cp -r $GITHUB_WORKSPACE/lib/browser/* gs://${{ secrets.GCS_BUCKET_NAME }}/lib/v${VERSION}/
