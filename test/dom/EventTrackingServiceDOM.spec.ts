@@ -5,7 +5,7 @@ import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
 import createFetchMock from "vitest-fetch-mock";
 
-import { VALID_EVENT } from "../util/EventFactory.js";
+import { VALID_ANONYMOUS_EVENT } from "../util/EventFactory.js";
 import { describeRequest, getError, NoErrorThrownError } from "../util/testUtils.js";
 
 import { EventTrackingConfig, EventTrackingService, HttpError } from "../../src/index.js";
@@ -74,7 +74,7 @@ describe(`Testing the EventTrackingService using JSDOM`, () => {
     });
 
     // Runs in a browser-like environment
-    await EventTrackingService.postEvent(VALID_EVENT, logOutcomes);
+    await EventTrackingService.postEvent(VALID_ANONYMOUS_EVENT, logOutcomes);
     expect(fetchMocker.requests().length).toEqual(2);
   });
 
@@ -90,7 +90,7 @@ describe(`Testing the EventTrackingService using JSDOM`, () => {
 
     // Runs in a browser-like environment
     const error = await getError<Error>(async () => {
-      await EventTrackingService.postEvent(VALID_EVENT, logOutcomes);
+      await EventTrackingService.postEvent(VALID_ANONYMOUS_EVENT, logOutcomes);
     });
 
     expect(error).not.toBeInstanceOf(NoErrorThrownError);
@@ -112,7 +112,7 @@ describe(`Testing the EventTrackingService using JSDOM`, () => {
 
     // Runs in a browser-like environment
     const error = await getError<Error>(async () => {
-      await EventTrackingService.postEvent(VALID_EVENT, logOutcomes);
+      await EventTrackingService.postEvent(VALID_ANONYMOUS_EVENT, logOutcomes);
     });
 
     expect(error).not.toBeInstanceOf(NoErrorThrownError);
@@ -136,7 +136,7 @@ describe(`Testing the EventTrackingService using JSDOM`, () => {
 
     // Runs in a browser-like environment
     const error = await getError<Error>(async () => {
-      await EventTrackingService.postEvent(VALID_EVENT, logOutcomes);
+      await EventTrackingService.postEvent(VALID_ANONYMOUS_EVENT, logOutcomes);
     });
 
     expect(error).not.toBeInstanceOf(NoErrorThrownError);
@@ -171,7 +171,7 @@ describe(`Testing the EventTrackingService using JSDOM`, () => {
 
     // Runs in a browser-like environment
     const error = await getError<Error>(async () => {
-      await EventTrackingService.postEvent(VALID_EVENT, logOutcomes);
+      await EventTrackingService.postEvent(VALID_ANONYMOUS_EVENT, logOutcomes);
     });
 
     expect(error).toBeInstanceOf(NoErrorThrownError);
@@ -190,7 +190,7 @@ describe(`Testing the EventTrackingService using JSDOM`, () => {
 
     // Runs in a browser-like environment
     const error = await getError<Error>(async () => {
-      await EventTrackingService.postEvent(VALID_EVENT, logOutcomes);
+      await EventTrackingService.postEvent(VALID_ANONYMOUS_EVENT, logOutcomes);
     });
 
     expect(error).not.toBeInstanceOf(NoErrorThrownError);
@@ -209,7 +209,7 @@ describe(`Testing the EventTrackingService using JSDOM`, () => {
 
     // Runs in a browser-like environment
     const error = await getError<Error>(async () => {
-      await EventTrackingService.postEvent(VALID_EVENT, logOutcomes);
+      await EventTrackingService.postEvent(VALID_ANONYMOUS_EVENT, logOutcomes);
     });
 
     expect(error).not.toBeInstanceOf(NoErrorThrownError);
@@ -226,7 +226,7 @@ describe(`Testing the EventTrackingService using JSDOM`, () => {
 
     // Runs in a browser-like environment
     const error = await getError<Error>(async () => {
-      await EventTrackingService.postEvent(VALID_EVENT, logOutcomes);
+      await EventTrackingService.postEvent(VALID_ANONYMOUS_EVENT, logOutcomes);
     });
 
     expect(error).not.toBeInstanceOf(NoErrorThrownError);
@@ -244,7 +244,7 @@ describe(`Testing the EventTrackingService using JSDOM`, () => {
     });
 
     // No error should be thrown
-    await EventTrackingService.postEvent(VALID_EVENT, logOutcomes);
+    await EventTrackingService.postEvent(VALID_ANONYMOUS_EVENT, logOutcomes);
 
     expect(fetchMocker.requests().length).toEqual(0);
   });

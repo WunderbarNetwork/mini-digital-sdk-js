@@ -6,6 +6,7 @@ Added:
 
 - Added the Changelog.md file
 - GitHub action which uploads browser builds to the Mini Digital CDN
+- Expanded the test coverage
 
 Fixed:
 
