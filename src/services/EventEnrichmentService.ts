@@ -78,7 +78,7 @@ export default function eventEnrichment(event: AnalyticsEvent, isBrowser: boolea
  *
  * 2) When tracking **identifiable** users, always set the `primaryIdentifier` field and optionally `anonymousUser` to `false`.
  * - if the `anonymousUser` field is omitted - it will automatically be set to `false`
- * - if `anonymousUser` is set to `true`, the SDK will obviously assume it an anonymous user instead
+ * - if `anonymousUser` is set to `true`, the SDK will obviously assume it is an anonymous user instead
  *
  * 3) It makes no sense to either:
  * - have both `primaryIdentifier` and `anonymousUser` fields omitted - will throw an `Error`
