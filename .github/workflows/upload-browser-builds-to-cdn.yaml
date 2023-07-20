@@ -70,4 +70,4 @@ jobs:
       - name: Upload Browser Build Files
         run: |
           VERSION=${{ steps.extract-version.outputs.version }}
-          gsutil -m cp -r $GITHUB_WORKSPACE/lib/browser/* gs://${{ secrets.GCS_BUCKET_NAME }}/lib/v${VERSION}/
+          gsutil -m cp -r $GITHUB_WORKSPACE/lib/browser/* gs://${{ secrets.GCS_BUCKET_NAME }}/lib/js/v${VERSION}/
