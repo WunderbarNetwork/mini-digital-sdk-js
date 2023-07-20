@@ -59,7 +59,7 @@ describe(`Testing the EventEnrichmentService using Node`, () => {
     // Referrer is not set by default in JSDOM
   });
 
-  it("Sets identifiers properly (anonymous user = true)", async () => {
+  it("Sets identifiers properly (anonymousUser = true, primaryIdentifier = undefined)", async () => {
     const enrichedEvent = eventEnrichment(VALID_EVENT, IS_BROWSER);
 
     expect(isStringNullOrEmpty(enrichedEvent.trackingId)).not.toBeTruthy();
@@ -68,7 +68,7 @@ describe(`Testing the EventEnrichmentService using Node`, () => {
     expect(enrichedEvent.trackingId).toMatch(enrichedEvent.primaryIdentifier ?? "");
   });
 
-  it("Sets identifiers properly (anonymous user = true, primary identifier also set)", async () => {
+  it("Sets identifiers properly (anonymousUser = true, primaryIdentifier = undefined)", async () => {
     const event = { ...PRIMARY_IDENTIFIER_SET };
     event.anonymousUser = true;
 
@@ -80,7 +80,7 @@ describe(`Testing the EventEnrichmentService using Node`, () => {
     expect(enrichedEvent.trackingId).toMatch(enrichedEvent.primaryIdentifier ?? "");
   });
 
-  it("Sets identifiers properly (anonymous user = false)", async () => {
+  it("Sets identifiers properly (anonymousUser = false, primaryIdentifier = set)", async () => {
     const enrichedEvent = eventEnrichment(PRIMARY_IDENTIFIER_SET, IS_BROWSER);
 
     expect(isStringNullOrEmpty(enrichedEvent.trackingId)).not.toBeTruthy();
@@ -89,7 +89,7 @@ describe(`Testing the EventEnrichmentService using Node`, () => {
     expect(enrichedEvent.primaryIdentifier).not.toMatch(enrichedEvent.trackingId);
   });
 
-  it("Sets identifiers properly (anonymous user = omitted, primary identifier set)", async () => {
+  it("Sets identifiers properly (anonymousUser = undefined, primaryIdentifier = set)", async () => {
     const event = { ...PRIMARY_IDENTIFIER_SET };
     event.anonymousUser = undefined;
 
@@ -101,7 +101,7 @@ describe(`Testing the EventEnrichmentService using Node`, () => {
     expect(enrichedEvent.primaryIdentifier).not.toMatch(enrichedEvent.trackingId);
   });
 
-  it("Fails if primary identifier not set, isAnonymous = undefined", async () => {
+  it("Fails (anonymousUser = undefined, primaryIdentifier = undefined)", async () => {
     const event = { ...VALID_EVENT };
     event.anonymousUser = undefined;
 
@@ -113,7 +113,7 @@ describe(`Testing the EventEnrichmentService using Node`, () => {
     expect(isStringNullOrEmpty(error.message)).not.toBeTruthy();
   });
 
-  it("Fails if primary identifier not set, isAnonymous = false", async () => {
+  it("Fails (anonymousUser = false, primaryIdentifier = undefined)", async () => {
     const event = { ...VALID_EVENT };
     event.anonymousUser = false;
 
