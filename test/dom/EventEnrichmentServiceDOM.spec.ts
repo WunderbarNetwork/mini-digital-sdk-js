@@ -37,7 +37,7 @@ describe(`Testing the EventEnrichmentService using Node`, () => {
   });
 
   it("Doesn't overwrite pre-defined custom properties", async () => {
-    const event = VALID_EVENT;
+    const event = { ...VALID_EVENT };
 
     event.eventProperties = {};
 
@@ -68,6 +68,18 @@ describe(`Testing the EventEnrichmentService using Node`, () => {
     expect(enrichedEvent.trackingId).toMatch(enrichedEvent.primaryIdentifier ?? "");
   });
 
+  it("Sets identifiers properly (anonymous user = true, primary identifier also set)", async () => {
+    const event = { ...PRIMARY_IDENTIFIER_SET };
+    event.anonymousUser = true;
+
+    const enrichedEvent = eventEnrichment(event, IS_BROWSER);
+
+    expect(isStringNullOrEmpty(enrichedEvent.trackingId)).not.toBeTruthy();
+    expect(isStringNullOrEmpty(enrichedEvent.primaryIdentifier)).not.toBeTruthy();
+    expect(enrichedEvent.anonymousUser).toMatch("1");
+    expect(enrichedEvent.trackingId).toMatch(enrichedEvent.primaryIdentifier ?? "");
+  });
+
   it("Sets identifiers properly (anonymous user = false)", async () => {
     const enrichedEvent = eventEnrichment(PRIMARY_IDENTIFIER_SET, IS_BROWSER);
 
@@ -78,7 +90,7 @@ describe(`Testing the EventEnrichmentService using Node`, () => {
   });
 
   it("Sets identifiers properly (anonymous user = omitted, primary identifier set)", async () => {
-    const event = PRIMARY_IDENTIFIER_SET;
+    const event = { ...PRIMARY_IDENTIFIER_SET };
     event.anonymousUser = undefined;
 
     const enrichedEvent = eventEnrichment(event, IS_BROWSER);
@@ -90,7 +102,7 @@ describe(`Testing the EventEnrichmentService using Node`, () => {
   });
 
   it("Fails if primary identifier not set, isAnonymous = undefined", async () => {
-    const event = VALID_EVENT;
+    const event = { ...VALID_EVENT };
     event.anonymousUser = undefined;
 
     const error = await getError<Error>(async () => {
@@ -102,7 +114,7 @@ describe(`Testing the EventEnrichmentService using Node`, () => {
   });
 
   it("Fails if primary identifier not set, isAnonymous = false", async () => {
-    const event = VALID_EVENT;
+    const event = { ...VALID_EVENT };
     event.anonymousUser = false;
 
     const error = await getError<Error>(async () => {
