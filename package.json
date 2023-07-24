@@ -58,6 +58,9 @@
   "resolutions": {
     "semver": "^7.5.4"
   },
+  "engines": {
+    "node": ">=18.17.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/WunderbarNetwork/mini-digital-sdk-js.git"
