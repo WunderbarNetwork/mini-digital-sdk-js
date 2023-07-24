@@ -6,7 +6,7 @@ on:
 
 jobs:
   publish:
-    name: Build & publish to NPM
+    name: Publish to NPM
 
     strategy:
       matrix:
@@ -31,7 +31,7 @@ jobs:
 
       - name: Publish to NPM
         run: |
-              yarn config set '//registry.npmjs.org/:_authToken' "${NODE_AUTH_TOKEN}"
+              yarn config set '//registry.npmjs.org/:_authToken' "${NPMJS_ACCESS_TOKEN}"
               yarn publish --verbose
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPMJS_ACCESS_TOKEN }}
+          NPMJS_ACCESS_TOKEN: ${{ secrets.NPMJS_ACCESS_TOKEN }}
