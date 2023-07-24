@@ -42,7 +42,7 @@
     "@typescript-eslint/parser": "^6.1.0",
     "eslint": "^8.45.0",
     "eslint-config-prettier": "^8.8.0",
-    "eslint-config-standard-with-typescript": "^36.1.0",
+    "eslint-import-resolver-typescript": "^3.5.5",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-n": "^16.0.1",
     "eslint-plugin-prettier": "^5.0.0",
@@ -56,7 +56,7 @@
     "vitest-fetch-mock": "^0.2.2"
   },
   "resolutions": {
-    "semver":  "^7.5.4"
+    "semver": "^7.5.4"
   },
   "repository": {
     "type": "git",
