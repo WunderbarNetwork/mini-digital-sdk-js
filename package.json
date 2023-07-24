@@ -20,7 +20,7 @@
   "browser": "lib/browser/mini-digital-sdk.esm.js",
   "scripts": {
     "clean": "rm -rf ./lib",
-    "build": "npm run build:node && npm run build:browser && npm run build:post",
+    "build": "npm run build:node && npm run build:post && npm run build:browser",
     "build:node": "npm run clean && tsc --build && mv lib/node/index.js lib/node/index.mjs",
     "build:browser": "rollup -c",
     "build:post": "node post-build.js",
