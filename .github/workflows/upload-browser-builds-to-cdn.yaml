@@ -7,12 +7,13 @@ on:
 jobs:
   upload:
     name: Upload Browser Builds to GCS
-    runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [18]
+        os: [ubuntu-latest]
 
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
