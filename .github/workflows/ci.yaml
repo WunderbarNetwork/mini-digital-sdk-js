@@ -7,12 +7,13 @@ on:
 jobs:
   build:
     name: CI build & test
-    runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [16, 18, latest]
+        os: [ubuntu-latest]
 
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -23,7 +24,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'yarn'
 
-      - name: Install dependencies
+      - name: Install dependencies & Build output
         run: yarn --network-concurrency 8 || yarn --check-files --cache-folder .ycache && rm -rf .ycache
 
       - name: Run tests
