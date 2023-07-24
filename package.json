@@ -2,6 +2,7 @@
   "name": "@wunderbar-network/mini-digital-sdk",
   "version": "1.3.2",
   "description": "SDK for back-end (Node) and front-end (TypeScript/JavaScript) applications, to send analytics events to Mini.Digital",
+  "private": false,
   "exports": {
     ".": {
       "types": "./lib/node/types/index.d.ts",
