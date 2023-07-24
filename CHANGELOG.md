@@ -1,6 +1,6 @@
 # Mini Digital SDK Changelog
 
-## [v1.3.2](https://github.com/WunderbarNetwork/mini-digital-sdk-js/compare/v1.3.1...v1.3.2) (TBC)
+## [v1.3.2](https://github.com/WunderbarNetwork/mini-digital-sdk-js/compare/v1.3.1...v1.3.2) (2023-07-24)
 
 Added:
 
@@ -12,6 +12,7 @@ Fixed:
 
 - TrackingID was not set correctly in certain edge cases
 - Updated dependency packages to fix vulnerability (CVE-2022-25883)
+- ESLint wasn't loading all the plugins and configs before
 
 ## [v1.3.1](https://github.com/WunderbarNetwork/mini-digital-sdk-js/compare/v1.3.0...v1.3.1) (2023-07-06)
 
