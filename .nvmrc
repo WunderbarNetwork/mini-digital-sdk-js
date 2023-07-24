@@ -1,1 +1,2 @@
-v18.17.0
+# Supported Node.js versions: 16.x (LTS), 18.x (LTS) and 20.x (latest)
+16
