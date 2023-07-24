@@ -53,7 +53,7 @@ describe(`Testing the EventTrackingService using Node`, () => {
 
     await EventTrackingService.postEvent(VALID_ANONYMOUS_EVENT, logOutcomes);
 
-    expect(fetchMocker.requests().length).toEqual(1);
+    expect(fetchMocker.requests().length).toBe(1);
   });
 
   it("Fails when no API Key is provided", async () => {
@@ -72,8 +72,8 @@ describe(`Testing the EventTrackingService using Node`, () => {
     // check that the returned error wasn't that no error was thrown
     expect(error).not.toBeInstanceOf(NoErrorThrownError);
     expect(error).not.toBeInstanceOf(HttpError);
-    expect(fetchMocker.requests().length).toEqual(0);
-    expect(error.message).toEqual("The API Key is not set in config.");
+    expect(fetchMocker.requests().length).toBe(0);
+    expect(error.message).toBe("The API Key is not set in config.");
   });
 
   it("Fails on user error (Bad Request, 400)", async () => {
@@ -93,8 +93,8 @@ describe(`Testing the EventTrackingService using Node`, () => {
 
     expect(error).not.toBeInstanceOf(NoErrorThrownError);
     expect(error).toBeInstanceOf(HttpError);
-    expect(fetchMocker.requests().length).toEqual(1); // Does not retry on failure
-    expect(error.message).toEqual("Mini Digital POST error! Status: 400");
+    expect(fetchMocker.requests().length).toBe(1); // Does not retry on failure
+    expect(error.message).toBe("Mini Digital POST error! Status: 400");
   });
 
   it("Fails after 5 retries on 500 errors", async () => {
@@ -117,8 +117,8 @@ describe(`Testing the EventTrackingService using Node`, () => {
 
     expect(error).not.toBeInstanceOf(NoErrorThrownError);
     expect(error).toBeInstanceOf(HttpError);
-    expect(fetchMocker.requests().length).toEqual(6); // Original call + 5 retries
-    expect(error.message).toEqual("Mini Digital POST error! Status: 500");
+    expect(fetchMocker.requests().length).toBe(6); // Original call + 5 retries
+    expect(error.message).toBe("Mini Digital POST error! Status: 500");
   });
 
   it("Retry succeeds after error 500", async () => {
@@ -152,7 +152,7 @@ describe(`Testing the EventTrackingService using Node`, () => {
 
     expect(error).toBeInstanceOf(NoErrorThrownError);
     expect(error).not.toBeInstanceOf(HttpError);
-    expect(fetchMocker.requests().length).toEqual(2); // Original call + retry
+    expect(fetchMocker.requests().length).toBe(2); // Original call + retry
   });
 
   it("Fails to parse a bad response from Mini Digital", async () => {
@@ -170,8 +170,8 @@ describe(`Testing the EventTrackingService using Node`, () => {
     });
 
     expect(error).not.toBeInstanceOf(NoErrorThrownError);
-    expect(fetchMocker.requests().length).toEqual(1); // Does not retry on failure
-    expect(error.message).toEqual("Could not parse the Mini Digital response.");
+    expect(fetchMocker.requests().length).toBe(1); // Does not retry on failure
+    expect(error.message).toBe("Could not parse the Mini Digital response.");
   });
 
   it("Fails if the Mini Digital endpoint is not defined", async () => {
@@ -190,8 +190,8 @@ describe(`Testing the EventTrackingService using Node`, () => {
 
     expect(error).not.toBeInstanceOf(NoErrorThrownError);
     expect(error).not.toBeInstanceOf(HttpError);
-    expect(fetchMocker.requests().length).toEqual(0);
-    expect(error.message).toEqual("The Mini Digital URL has not been defined in the config.");
+    expect(fetchMocker.requests().length).toBe(0);
+    expect(error.message).toBe("The Mini Digital URL has not been defined in the config.");
   });
 
   it("Fails when the fetch request throws an exception", async () => {
@@ -206,8 +206,8 @@ describe(`Testing the EventTrackingService using Node`, () => {
     });
 
     expect(error).not.toBeInstanceOf(NoErrorThrownError);
-    expect(fetchMocker.requests().length).toEqual(1); // Does not retry on failure
-    expect(error.message).toEqual("Error interfacing with Mini Digital.");
+    expect(fetchMocker.requests().length).toBe(1); // Does not retry on failure
+    expect(error.message).toBe("Error interfacing with Mini Digital.");
   });
 
   it("Doesn't send a request when config.pauseTracking is true", async () => {
@@ -222,6 +222,6 @@ describe(`Testing the EventTrackingService using Node`, () => {
     // No error should be thrown
     await EventTrackingService.postEvent(VALID_ANONYMOUS_EVENT, logOutcomes);
 
-    expect(fetchMocker.requests().length).toEqual(0);
+    expect(fetchMocker.requests().length).toBe(0);
   });
 });

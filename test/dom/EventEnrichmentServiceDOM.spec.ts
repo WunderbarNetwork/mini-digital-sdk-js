@@ -4,14 +4,14 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import Cookies from "js-cookie";
 
-import eventEnrichment from "../../src/services/EventEnrichmentService";
-import { isStringNullOrEmpty } from "../../src/util/Util";
+import eventEnrichment from "../../src/services/EventEnrichmentService.js";
+import { isStringNullOrEmpty } from "../../src/util/Util.js";
 
-import * as config from "../../src/util/Config";
+import * as config from "../../src/util/Config.js";
 
 import { getError, NoErrorThrownError } from "../util/testUtils.js";
 
-import { EVENT_NO_IDENTIFIERS, DUMMY_PRIMARY_IDENTIFIER, DUMMY_TRACKING_ID } from "../util/EventFactory";
+import { EVENT_NO_IDENTIFIERS, DUMMY_PRIMARY_IDENTIFIER, DUMMY_TRACKING_ID } from "../util/EventFactory.js";
 
 const IS_BROWSER: boolean = true;
 
@@ -66,8 +66,8 @@ describe(`Testing the EventEnrichmentService using Node`, () => {
     expect(enrichedEvent.eventProperties.userAgent).toMatch("TEST1");
     expect(enrichedEvent.eventProperties.localTimezone).toMatch("TEST2");
     expect(enrichedEvent.eventProperties.currentPage).toMatch("TEST3");
-    expect(enrichedEvent.eventProperties.screenWidth).toEqual(1);
-    expect(enrichedEvent.eventProperties.screenHeight).toEqual(2);
+    expect(enrichedEvent.eventProperties.screenWidth).toBe(1);
+    expect(enrichedEvent.eventProperties.screenHeight).toBe(2);
 
     // Referrer is not set by default in JSDOM
   });

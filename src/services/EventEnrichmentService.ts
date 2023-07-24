@@ -86,7 +86,7 @@ export default function eventEnrichment(event: AnalyticsEvent, isBrowser: boolea
  */
 function determineIdentifiers(
   event: AnalyticsEvent,
-  isBrowser: boolean
+  isBrowser: boolean,
 ): { primaryIdentifier: string; trackingId: string; isAnonymous: boolean } {
   let trackingId: string | undefined;
   let primaryIdentifier: string | undefined = event.primaryIdentifier;

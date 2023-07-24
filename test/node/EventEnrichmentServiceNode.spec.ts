@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import eventEnrichment from "../../src/services/EventEnrichmentService";
-import { isStringNullOrEmpty } from "../../src/util/Util";
+import eventEnrichment from "../../src/services/EventEnrichmentService.js";
+import { isStringNullOrEmpty } from "../../src/util/Util.js";
 
-import * as config from "../../src/util/Config";
+import * as config from "../../src/util/Config.js";
 
 import { getError, NoErrorThrownError } from "../util/testUtils.js";
 
-import { EVENT_NO_IDENTIFIERS, DUMMY_PRIMARY_IDENTIFIER } from "../util/EventFactory";
+import { EVENT_NO_IDENTIFIERS, DUMMY_PRIMARY_IDENTIFIER } from "../util/EventFactory.js";
 
 const IS_BROWSER: boolean = false;
 
