@@ -50,8 +50,8 @@ When not using a package manager (such as npm or yarn), bundles for different mo
 
 Mini Digital provides bundles in two module formats that can be used inside client-side code:
 
-1. **mini-digital-sdk.min.mjs** - ES2015 Modules/ESM bundle for most modern browsers
-2. **mini-digital-sdk.min.umd.js** - Universal Module Definition/UMD bundle, primarily intended for older browsers or other environments
+1. **`mini-digital-sdk.min.mjs`** - ES2015 Modules/ESM bundle for most modern browsers
+2. **`mini-digital-sdk.min.umd.js`** - Universal Module Definition/UMD bundle, primarily intended for older browsers or other environments
 
 When referencing bundles from the **Mini Digital CDN**, the CDN URL is as follows:
 
@@ -59,7 +59,7 @@ When referencing bundles from the **Mini Digital CDN**, the CDN URL is as follow
 https://cdn.mini.digital/lib/js/v1.4/mini-digital-sdk.min.mjs
 ```
 
-The **version** in the CDN URL above is in the format **`v**#MAJOR**.**#MINOR`** and will always give the latest published **revision**. Released versions can be seen on our [GitHub releases page](https://github.com/WunderbarNetwork/mini-digital-sdk-js/releases).
+The **version** in the CDN URL above is in the format **`v#MAJOR.#MINOR`** and will always give the latest published **revision**. Released versions can be seen on our [GitHub releases page](https://github.com/WunderbarNetwork/mini-digital-sdk-js/releases).
 
 All of the bundles are minified (hence the `.min` in the file names), and source maps (attaching `.map` to the end of the file name) are also available.
 
