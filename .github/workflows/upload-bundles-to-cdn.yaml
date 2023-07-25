@@ -1,4 +1,4 @@
-name: Upload browser builds to CDN
+name: Upload bundles to CDN
 
 on:
   release:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   upload:
-    name: Upload Browser Builds to GCS
+    name: Upload Bundles to GCS
 
     strategy:
       matrix:
@@ -24,11 +24,11 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'yarn'
 
-      - name: Install dependencies & build lib folder
+      - name: Install dependencies & build lib output
         run: yarn --network-concurrency 8 || yarn --check-files --cache-folder .ycache && rm -rf .ycache
 
-      - name: Debug - Output Browser Build Files To Be Copied
-        run: ls -la $GITHUB_WORKSPACE/lib/browser
+      - name: Debug - output bundles file list
+        run: ls -la $GITHUB_WORKSPACE/lib/bundles
 
       - name: Check Google Cloud SDK Presence
         id: check-gcloud-sdk
@@ -66,9 +66,9 @@ jobs:
           VERSION=$(node -p "require('./package.json').version")
           MAJOR_MINOR_VERSION=$(echo $VERSION | cut -d '.' -f 1-2)
           echo "::set-output name=version::$MAJOR_MINOR_VERSION"
-          echo "Uploading browser libraries for version v$MAJOR_MINOR_VERSION"
+          echo "Uploading bundles for version v$MAJOR_MINOR_VERSION"
 
-      - name: Upload Browser Build Files
+      - name: Upload Bundles to GCS
         run: |
           VERSION=${{ steps.extract-version.outputs.version }}
-          gsutil -m cp -r $GITHUB_WORKSPACE/lib/browser/* gs://${{ secrets.GCS_BUCKET_NAME }}/lib/js/v${VERSION}/
+          gsutil -m cp -r $GITHUB_WORKSPACE/lib/bundles/* gs://${{ secrets.GCS_BUCKET_NAME }}/lib/js/v${VERSION}/

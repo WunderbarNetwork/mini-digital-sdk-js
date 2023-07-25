@@ -5,9 +5,9 @@ import terser from "@rollup/plugin-terser";
 export default {
   input: "lib/node/index.mjs", // import compiled TS output
   output: [
-    { name: "miniDigitalSdk", file: "lib/browser/mini-digital-sdk.umd.js", format: "umd", sourcemap: true },
-    { name: "miniDigitalSdk", file: "lib/browser/mini-digital-sdk.cjs.js", format: "cjs", sourcemap: true },
-    { name: "miniDigitalSdk", file: "lib/browser/mini-digital-sdk.esm.js", format: "es", sourcemap: true },
+    { name: "MiniDigital", file: "lib/bundles/mini-digital-sdk.min.umd.js", format: "umd", sourcemap: true },
+    { name: "MiniDigital", file: "lib/bundles/mini-digital-sdk.min.cjs", format: "cjs", sourcemap: true },
+    { name: "MiniDigital", file: "lib/bundles/mini-digital-sdk.min.mjs", format: "es", sourcemap: true },
   ],
   plugins: [
     resolve(), // include dependencies from node_modules (but not devDependencies)

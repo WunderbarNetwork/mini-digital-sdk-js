@@ -2,11 +2,13 @@
 
 ## [v1.4.0](https://github.com/WunderbarNetwork/mini-digital-sdk-js/compare/v1.3.1...v1.3.2) (2023-07-26)
 
+⚠️ Bundle location and file names have been modified, and ESM/UMD/CJS bundles now sit in the `lib/bundles` folder.
+
 Added:
 
 - Added the CHANGELOG.md file
 - Dev: Greatly expanded the test coverage
-- Dev: GitHub action which uploads browser builds to the Mini Digital CDN
+- Dev: GitHub action which uploads bundles to the Mini Digital CDN
 - Dev: CI/Build runs on all supported Node versions - 16 (LTS), 18 (LTS) & 20 (latest)
 
 Fixed:
