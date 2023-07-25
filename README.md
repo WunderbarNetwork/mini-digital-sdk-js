@@ -89,8 +89,7 @@ The ESM bundle is recommended to be used whenever possible, as most modern brows
 
 ### Using the Universal Module Definition/UMD bundle
 
-For older browsers, a UMD version of the bundle can also be used. To send the same event as above,
-while also referencing the UMD bundle version of the SDK from the **Mini Digital CDN**, do the following:
+For older browsers, a UMD version of the bundle can also be used. To send the same event as above, while also referencing the UMD bundle version of the SDK from the **Mini Digital CDN**, do the following:
 
 ```html
 <button type="button" id="myButton">Send Interaction Event</button>
