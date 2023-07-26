@@ -1,0 +1,74 @@
+name: Upload bundles to CDN
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  upload:
+    name: Upload Bundles to GCS
+
+    strategy:
+      matrix:
+        node-version: [18]
+        os: [ubuntu-latest]
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Using Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
+
+      - name: Install dependencies & build lib output
+        run: yarn --network-concurrency 8 || yarn --check-files --cache-folder .ycache && rm -rf .ycache
+
+      - name: Debug - output bundles file list
+        run: ls -la $GITHUB_WORKSPACE/lib/bundles
+
+      - name: Check Google Cloud SDK Presence
+        id: check-gcloud-sdk
+        run: |
+          if command -v gcloud >/dev/null 2>&1; then
+            echo "Google Cloud SDK is already installed."
+            exit 0
+          else
+            echo "Google Cloud SDK not found. Proceeding with installation."
+            exit 1
+          fi
+
+      - name: Install Google Cloud SDK (optional - if not present)
+        if: steps.check-gcloud-sdk.outputs.result == '1'
+        run: |
+          curl https://sdk.cloud.google.com | bash
+          exec -l $SHELL
+
+      - name: Create Temporary Service Account Key File
+        id: create-key-file
+        run: |
+          echo "$GCP_CREDENTIALS" > /tmp/keyfile.json
+        env:
+          GCP_CREDENTIALS: ${{ secrets.GCP_SERVICE_ACCOUNT_CREDENTIALS }}
+
+      - name: Authenticate with Google Cloud
+        run: gcloud auth activate-service-account --key-file=/tmp/keyfile.json
+
+      - name: Delete Temporary Key File
+        run: rm /tmp/keyfile.json
+
+      - name: Extract Version from package.json
+        id: extract-version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          MAJOR_MINOR_VERSION=$(echo $VERSION | cut -d '.' -f 1-2)
+          echo "::set-output name=version::$MAJOR_MINOR_VERSION"
+          echo "Uploading bundles for version v$MAJOR_MINOR_VERSION"
+
+      - name: Upload Bundles to GCS
+        run: |
+          VERSION=${{ steps.extract-version.outputs.version }}
+          gsutil -m cp -r $GITHUB_WORKSPACE/lib/bundles/* gs://${{ secrets.GCS_BUCKET_NAME }}/lib/js/v${VERSION}/

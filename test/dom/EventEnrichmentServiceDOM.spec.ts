@@ -1,27 +1,38 @@
 /**
  * @vitest-environment jsdom
  */
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
+import Cookies from "js-cookie";
 
-import eventEnrichment from "../../src/services/EventEnrichmentService";
-import { isStringNullOrEmpty } from "../../src/util/Util";
+import eventEnrichment from "../../src/services/EventEnrichmentService.js";
+import { isStringNullOrEmpty } from "../../src/util/Util.js";
 
-import * as config from "../../src/util/Config";
+import * as config from "../../src/util/Config.js";
 
 import { getError, NoErrorThrownError } from "../util/testUtils.js";
 
-import { VALID_EVENT, PRIMARY_IDENTIFIER_SET } from "../util/EventFactory";
+import { EVENT_NO_IDENTIFIERS, DUMMY_PRIMARY_IDENTIFIER, DUMMY_TRACKING_ID } from "../util/EventFactory.js";
 
 const IS_BROWSER: boolean = true;
 
 describe(`Testing the EventEnrichmentService using Node`, () => {
+  beforeAll(() => {
+    // Make sure cookie doesn't exist
+    Cookies.remove(config.COOKIE_NAME_TRACKING_ID);
+  });
+
   it("Attaches additional properties to the event", async () => {
-    const enrichedEvent = eventEnrichment(VALID_EVENT, IS_BROWSER);
+    const event = { ...EVENT_NO_IDENTIFIERS };
+    event.anonymousUser = true;
+    event.primaryIdentifier = undefined;
+
+    const enrichedEvent = eventEnrichment(event, IS_BROWSER);
 
     expect(isStringNullOrEmpty(enrichedEvent.eventId)).not.toBeTruthy();
     expect(isStringNullOrEmpty(enrichedEvent.trackingId)).not.toBeTruthy();
     expect(isStringNullOrEmpty(enrichedEvent.primaryIdentifier)).not.toBeTruthy();
     expect(enrichedEvent.anonymousUser).toMatch("1");
+    expect(enrichedEvent.primaryIdentifier).not.toMatch(DUMMY_PRIMARY_IDENTIFIER);
     expect(isStringNullOrEmpty(enrichedEvent.timestamp)).not.toBeTruthy();
     expect(enrichedEvent.sdkVersion).toMatch(config.SDK_VERSION);
     expect(isStringNullOrEmpty(enrichedEvent.schemaVersion)).not.toBeTruthy();
@@ -37,7 +48,9 @@ describe(`Testing the EventEnrichmentService using Node`, () => {
   });
 
   it("Doesn't overwrite pre-defined custom properties", async () => {
-    const event = VALID_EVENT;
+    const event = { ...EVENT_NO_IDENTIFIERS };
+    event.anonymousUser = true;
+    event.primaryIdentifier = undefined;
 
     event.eventProperties = {};
 
@@ -53,43 +66,144 @@ describe(`Testing the EventEnrichmentService using Node`, () => {
     expect(enrichedEvent.eventProperties.userAgent).toMatch("TEST1");
     expect(enrichedEvent.eventProperties.localTimezone).toMatch("TEST2");
     expect(enrichedEvent.eventProperties.currentPage).toMatch("TEST3");
-    expect(enrichedEvent.eventProperties.screenWidth).toEqual(1);
-    expect(enrichedEvent.eventProperties.screenHeight).toEqual(2);
+    expect(enrichedEvent.eventProperties.screenWidth).toBe(1);
+    expect(enrichedEvent.eventProperties.screenHeight).toBe(2);
 
     // Referrer is not set by default in JSDOM
   });
 
-  it("Sets identifiers properly (anonymous user = true)", async () => {
-    const enrichedEvent = eventEnrichment(VALID_EVENT, IS_BROWSER);
+  it("Sets identifiers properly (anonymousUser = true, primaryIdentifier = undefined, trackingId = undefined)", async () => {
+    const event = { ...EVENT_NO_IDENTIFIERS };
+    event.anonymousUser = true;
+    event.primaryIdentifier = undefined;
+
+    const enrichedEvent = eventEnrichment(event, IS_BROWSER);
 
     expect(isStringNullOrEmpty(enrichedEvent.trackingId)).not.toBeTruthy();
     expect(isStringNullOrEmpty(enrichedEvent.primaryIdentifier)).not.toBeTruthy();
     expect(enrichedEvent.anonymousUser).toMatch("1");
+    expect(enrichedEvent.trackingId).not.toMatch(DUMMY_TRACKING_ID);
+    expect(enrichedEvent.primaryIdentifier).not.toMatch(DUMMY_PRIMARY_IDENTIFIER);
     expect(enrichedEvent.trackingId).toMatch(enrichedEvent.primaryIdentifier ?? "");
   });
 
-  it("Sets identifiers properly (anonymous user = false)", async () => {
-    const enrichedEvent = eventEnrichment(PRIMARY_IDENTIFIER_SET, IS_BROWSER);
+  it("Sets identifiers properly (anonymousUser = true, primaryIdentifier = undefined, trackingId = set)", async () => {
+    Cookies.set(config.COOKIE_NAME_TRACKING_ID, DUMMY_TRACKING_ID);
+
+    const event = { ...EVENT_NO_IDENTIFIERS };
+    event.anonymousUser = true;
+    event.primaryIdentifier = undefined;
+
+    const enrichedEvent = eventEnrichment(event, IS_BROWSER);
 
     expect(isStringNullOrEmpty(enrichedEvent.trackingId)).not.toBeTruthy();
     expect(isStringNullOrEmpty(enrichedEvent.primaryIdentifier)).not.toBeTruthy();
-    expect(enrichedEvent.anonymousUser).toMatch("0");
+    expect(enrichedEvent.anonymousUser).toMatch("1");
+    expect(enrichedEvent.trackingId).toMatch(DUMMY_TRACKING_ID);
+    expect(enrichedEvent.primaryIdentifier).not.toMatch(DUMMY_PRIMARY_IDENTIFIER);
+    expect(enrichedEvent.trackingId).toMatch(enrichedEvent.primaryIdentifier ?? "");
   });
 
-  it("Sets identifiers properly (anonymous user = omitted, primary identifier set)", async () => {
-    const event = PRIMARY_IDENTIFIER_SET;
-    event.anonymousUser = undefined;
+  it("Sets identifiers properly (anonymousUser = true, primaryIdentifier = set, trackingId = undefined)", async () => {
+    const event = { ...EVENT_NO_IDENTIFIERS };
+    event.anonymousUser = true;
+    event.primaryIdentifier = DUMMY_PRIMARY_IDENTIFIER;
+
+    const enrichedEvent = eventEnrichment(event, IS_BROWSER);
+
+    expect(isStringNullOrEmpty(enrichedEvent.trackingId)).not.toBeTruthy();
+    expect(isStringNullOrEmpty(enrichedEvent.primaryIdentifier)).not.toBeTruthy();
+    expect(enrichedEvent.anonymousUser).toMatch("1");
+    expect(enrichedEvent.trackingId).not.toMatch(DUMMY_TRACKING_ID);
+    expect(enrichedEvent.primaryIdentifier).toMatch(DUMMY_PRIMARY_IDENTIFIER);
+    expect(enrichedEvent.trackingId).toMatch(enrichedEvent.primaryIdentifier ?? "");
+  });
+
+  it("Sets identifiers properly (anonymousUser = true, primaryIdentifier = set, trackingId = set)", async () => {
+    Cookies.set(config.COOKIE_NAME_TRACKING_ID, DUMMY_TRACKING_ID);
+
+    const event = { ...EVENT_NO_IDENTIFIERS };
+    event.anonymousUser = true;
+    event.primaryIdentifier = DUMMY_PRIMARY_IDENTIFIER;
+
+    const enrichedEvent = eventEnrichment(event, IS_BROWSER);
+
+    expect(isStringNullOrEmpty(enrichedEvent.trackingId)).not.toBeTruthy();
+    expect(isStringNullOrEmpty(enrichedEvent.primaryIdentifier)).not.toBeTruthy();
+    expect(enrichedEvent.anonymousUser).toMatch("1");
+    expect(enrichedEvent.trackingId).not.toMatch(DUMMY_TRACKING_ID);
+    expect(enrichedEvent.primaryIdentifier).toMatch(DUMMY_PRIMARY_IDENTIFIER);
+    expect(enrichedEvent.trackingId).toMatch(enrichedEvent.primaryIdentifier ?? "");
+  });
+
+  it("Sets identifiers properly (anonymousUser = false, primaryIdentifier = set, trackingId = undefined)", async () => {
+    const event = { ...EVENT_NO_IDENTIFIERS };
+    event.anonymousUser = false;
+    event.primaryIdentifier = DUMMY_PRIMARY_IDENTIFIER;
 
     const enrichedEvent = eventEnrichment(event, IS_BROWSER);
 
     expect(isStringNullOrEmpty(enrichedEvent.trackingId)).not.toBeTruthy();
     expect(isStringNullOrEmpty(enrichedEvent.primaryIdentifier)).not.toBeTruthy();
     expect(enrichedEvent.anonymousUser).toMatch("0");
+    expect(enrichedEvent.trackingId).not.toMatch(DUMMY_TRACKING_ID);
+    expect(enrichedEvent.primaryIdentifier).toMatch(DUMMY_PRIMARY_IDENTIFIER);
+    expect(enrichedEvent.primaryIdentifier).not.toMatch(enrichedEvent.trackingId);
   });
 
-  it("Fails if primary identifier not set, isAnonymous = undefined", async () => {
-    const event = VALID_EVENT;
+  it("Sets identifiers properly (anonymousUser = false, primaryIdentifier = set, trackingId = set)", async () => {
+    Cookies.set(config.COOKIE_NAME_TRACKING_ID, DUMMY_TRACKING_ID);
+
+    const event = { ...EVENT_NO_IDENTIFIERS };
+    event.anonymousUser = false;
+    event.primaryIdentifier = DUMMY_PRIMARY_IDENTIFIER;
+
+    const enrichedEvent = eventEnrichment(event, IS_BROWSER);
+
+    expect(isStringNullOrEmpty(enrichedEvent.trackingId)).not.toBeTruthy();
+    expect(isStringNullOrEmpty(enrichedEvent.primaryIdentifier)).not.toBeTruthy();
+    expect(enrichedEvent.anonymousUser).toMatch("0");
+    expect(enrichedEvent.trackingId).toMatch(DUMMY_TRACKING_ID);
+    expect(enrichedEvent.primaryIdentifier).toMatch(DUMMY_PRIMARY_IDENTIFIER);
+    expect(enrichedEvent.primaryIdentifier).not.toMatch(enrichedEvent.trackingId);
+  });
+
+  it("Sets identifiers properly (anonymousUser = undefined, primaryIdentifier = set, trackingId = undefined)", async () => {
+    const event = { ...EVENT_NO_IDENTIFIERS };
     event.anonymousUser = undefined;
+    event.primaryIdentifier = DUMMY_PRIMARY_IDENTIFIER;
+
+    const enrichedEvent = eventEnrichment(event, IS_BROWSER);
+
+    expect(isStringNullOrEmpty(enrichedEvent.trackingId)).not.toBeTruthy();
+    expect(isStringNullOrEmpty(enrichedEvent.primaryIdentifier)).not.toBeTruthy();
+    expect(enrichedEvent.anonymousUser).toMatch("0");
+    expect(enrichedEvent.trackingId).not.toMatch(DUMMY_TRACKING_ID);
+    expect(enrichedEvent.primaryIdentifier).toMatch(DUMMY_PRIMARY_IDENTIFIER);
+    expect(enrichedEvent.primaryIdentifier).not.toMatch(enrichedEvent.trackingId);
+  });
+
+  it("Sets identifiers properly (anonymousUser = undefined, primaryIdentifier = set, trackingId = set)", async () => {
+    Cookies.set(config.COOKIE_NAME_TRACKING_ID, DUMMY_TRACKING_ID);
+
+    const event = { ...EVENT_NO_IDENTIFIERS };
+    event.anonymousUser = undefined;
+    event.primaryIdentifier = DUMMY_PRIMARY_IDENTIFIER;
+
+    const enrichedEvent = eventEnrichment(event, IS_BROWSER);
+
+    expect(isStringNullOrEmpty(enrichedEvent.trackingId)).not.toBeTruthy();
+    expect(isStringNullOrEmpty(enrichedEvent.primaryIdentifier)).not.toBeTruthy();
+    expect(enrichedEvent.anonymousUser).toMatch("0");
+    expect(enrichedEvent.trackingId).toMatch(DUMMY_TRACKING_ID);
+    expect(enrichedEvent.primaryIdentifier).toMatch(DUMMY_PRIMARY_IDENTIFIER);
+    expect(enrichedEvent.primaryIdentifier).not.toMatch(enrichedEvent.trackingId);
+  });
+
+  it("Fails (anonymousUser = undefined, primaryIdentifier = undefined)", async () => {
+    const event = { ...EVENT_NO_IDENTIFIERS };
+    event.anonymousUser = undefined;
+    event.primaryIdentifier = undefined;
 
     const error = await getError<Error>(async () => {
       eventEnrichment(event, IS_BROWSER);
@@ -99,9 +213,10 @@ describe(`Testing the EventEnrichmentService using Node`, () => {
     expect(isStringNullOrEmpty(error.message)).not.toBeTruthy();
   });
 
-  it("Fails if primary identifier not set, isAnonymous = false", async () => {
-    const event = VALID_EVENT;
+  it("Fails (anonymousUser = false, primaryIdentifier = undefined)", async () => {
+    const event = { ...EVENT_NO_IDENTIFIERS };
     event.anonymousUser = false;
+    event.primaryIdentifier = undefined;
 
     const error = await getError<Error>(async () => {
       eventEnrichment(event, IS_BROWSER);

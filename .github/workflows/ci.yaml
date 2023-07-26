@@ -1,4 +1,4 @@
-name: Node.js CI
+name: CI
 
 on:
   pull_request:
@@ -6,29 +6,29 @@ on:
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    name: CI build & test
 
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [16, 18, latest]
+        os: [ubuntu-latest]
 
+    runs-on: ${{ matrix.os }}
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Using Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'yarn'
+      - name: Using Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
 
-    - name: Install dependencies
-      run: yarn --network-concurrency 8 || yarn --check-files --cache-folder .ycache && rm -rf .ycache
+      - name: Install dependencies & Build output
+        run: yarn --network-concurrency 8 || yarn --check-files --cache-folder .ycache && rm -rf .ycache
 
-    - name: Run tests
-      run: yarn test
+      - name: Run tests
+        run: yarn test
 
-    - name: Check for lint errors
-      run: yarn lint
-    
+      - name: Check for lint errors
+        run: yarn lint

@@ -6,12 +6,14 @@ on:
 
 jobs:
   publish:
-    runs-on: ubuntu-latest
+    name: Publish to NPM
 
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [18]
+        os: [ubuntu-latest]
 
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -29,7 +31,7 @@ jobs:
 
       - name: Publish to NPM
         run: |
-              yarn config set '//registry.npmjs.org/:_authToken' "${NODE_AUTH_TOKEN}"
+              yarn config set '//registry.npmjs.org/:_authToken' "${NPMJS_ACCESS_TOKEN}"
               yarn publish --verbose
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPMJS_ACCESS_TOKEN }}
+          NPMJS_ACCESS_TOKEN: ${{ secrets.NPMJS_ACCESS_TOKEN }}

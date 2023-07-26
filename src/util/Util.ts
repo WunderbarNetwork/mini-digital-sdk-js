@@ -15,7 +15,7 @@ export async function retryAsyncFetchFunction<T>(
   fn: () => Promise<T>,
   retryIntervalMillis: number,
   retries: number,
-  lastError?: Error
+  lastError?: Error,
 ): Promise<T> {
   if (retryIntervalMillis <= 0 || retries <= 0) {
     // Do not retry, only execute once

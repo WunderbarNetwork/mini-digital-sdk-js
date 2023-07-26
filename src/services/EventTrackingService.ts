@@ -49,7 +49,7 @@ export async function postEvent(event: AnalyticsEvent, logResponse: boolean = fa
         await postEventJwt(analyticsEvent, miniDigitalUrl, logResponse);
       },
       config.errorRetryIntervalMs,
-      config.maxRetriesOn500
+      config.maxRetriesOn500,
     );
   } else {
     await retryAsyncFetchFunction(
@@ -58,7 +58,7 @@ export async function postEvent(event: AnalyticsEvent, logResponse: boolean = fa
         await postEventApiKey(analyticsEvent, miniDigitalUrl, logResponse);
       },
       config.errorRetryIntervalMs,
-      config.maxRetriesOn500
+      config.maxRetriesOn500,
     );
   }
 }
@@ -105,7 +105,7 @@ async function executeJwtFetch(
   event: EnrichedAnalyticsEvent,
   forceErrorOn401: boolean,
   miniDigitalUrl: string,
-  logResponse: boolean
+  logResponse: boolean,
 ): Promise<ServiceResponse> {
   let response: Response;
   try {
