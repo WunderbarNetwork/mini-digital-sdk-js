@@ -1,6 +1,6 @@
 # Mini Digital SDK Changelog
 
-## [v1.4.0](https://github.com/WunderbarNetwork/mini-digital-sdk-js/compare/v1.3.1...v1.3.2) (2023-07-26)
+## [v1.4.0](https://github.com/WunderbarNetwork/mini-digital-sdk-js/compare/v1.3.1...v1.4.0) (2023-07-26)
 
 ⚠️ Bundle location and file names have been modified, and ESM/UMD/CJS bundles now sit in the `lib/bundles` folder.
 

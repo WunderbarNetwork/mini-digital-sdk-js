@@ -31,7 +31,7 @@ jobs:
 
       - name: Publish to NPM
         run: |
-              yarn config set '//registry.npmjs.org/:_authToken' "${NPMJS_ACCESS_TOKEN}"
-              yarn publish --verbose
+              npm config set '//registry.npmjs.org/:_authToken' "${NPMJS_ACCESS_TOKEN}"
+              npm publish --verbose
         env:
           NPMJS_ACCESS_TOKEN: ${{ secrets.NPMJS_ACCESS_TOKEN }}
