@@ -21,7 +21,7 @@ const isBrowser: boolean = typeof window !== "undefined" && typeof window.docume
  *
  * @param event Event to be stored
  * @param logResponse Optional - output to console when event has been successfully posted (default = false)
- * @param raiseExceptions Optional - Throws exceptions (default = false)
+ * @param raiseExceptions Optional - SDK will throw exceptions when true (default = false)
  */
 export async function postEvent(event: AnalyticsEvent, logResponse: boolean = false, raiseExceptions: boolean = false): Promise<void> {
   // If tracking was turned off, don't go any further.
