@@ -19,6 +19,8 @@ const fetchMocker = createFetchMock(vi);
 // Use console logs while testing. Could be an env variable in the future.
 const logOutcomes: boolean = false;
 
+const raiseExceptions: boolean = true;
+
 describe(`Testing the EventTrackingService using Node`, () => {
   beforeAll(() => {
     // sets globalThis.fetch and globalThis.fetchMock to our mocked version
@@ -66,7 +68,7 @@ describe(`Testing the EventTrackingService using Node`, () => {
     });
 
     const error = await getError<Error>(async () => {
-      await EventTrackingService.postEvent(VALID_ANONYMOUS_EVENT, logOutcomes);
+      await EventTrackingService.postEvent(VALID_ANONYMOUS_EVENT, logOutcomes, raiseExceptions);
     });
 
     // check that the returned error wasn't that no error was thrown
@@ -88,7 +90,7 @@ describe(`Testing the EventTrackingService using Node`, () => {
 
     // Runs in a Node (non-browser) environment
     const error = await getError<Error>(async () => {
-      await EventTrackingService.postEvent(VALID_ANONYMOUS_EVENT, logOutcomes);
+      await EventTrackingService.postEvent(VALID_ANONYMOUS_EVENT, logOutcomes, raiseExceptions);
     });
 
     expect(error).not.toBeInstanceOf(NoErrorThrownError);
@@ -112,7 +114,7 @@ describe(`Testing the EventTrackingService using Node`, () => {
 
     // Runs in a Node (non-browser) environment
     const error = await getError<Error>(async () => {
-      await EventTrackingService.postEvent(VALID_ANONYMOUS_EVENT, logOutcomes);
+      await EventTrackingService.postEvent(VALID_ANONYMOUS_EVENT, logOutcomes, raiseExceptions);
     });
 
     expect(error).not.toBeInstanceOf(NoErrorThrownError);
@@ -147,7 +149,7 @@ describe(`Testing the EventTrackingService using Node`, () => {
 
     // Runs in a Node (non-browser) environment
     const error = await getError<Error>(async () => {
-      await EventTrackingService.postEvent(VALID_ANONYMOUS_EVENT, logOutcomes);
+      await EventTrackingService.postEvent(VALID_ANONYMOUS_EVENT, logOutcomes, raiseExceptions);
     });
 
     expect(error).toBeInstanceOf(NoErrorThrownError);
@@ -166,7 +168,7 @@ describe(`Testing the EventTrackingService using Node`, () => {
 
     // Runs in a Node (non-browser) environment
     const error = await getError<Error>(async () => {
-      await EventTrackingService.postEvent(VALID_ANONYMOUS_EVENT, logOutcomes);
+      await EventTrackingService.postEvent(VALID_ANONYMOUS_EVENT, logOutcomes, raiseExceptions);
     });
 
     expect(error).not.toBeInstanceOf(NoErrorThrownError);
@@ -185,7 +187,7 @@ describe(`Testing the EventTrackingService using Node`, () => {
 
     // Runs in a Node (non-browser) environment
     const error = await getError<Error>(async () => {
-      await EventTrackingService.postEvent(VALID_ANONYMOUS_EVENT, logOutcomes);
+      await EventTrackingService.postEvent(VALID_ANONYMOUS_EVENT, logOutcomes, raiseExceptions);
     });
 
     expect(error).not.toBeInstanceOf(NoErrorThrownError);
@@ -202,12 +204,26 @@ describe(`Testing the EventTrackingService using Node`, () => {
 
     // Runs in a Node (non-browser) environment
     const error = await getError<Error>(async () => {
-      await EventTrackingService.postEvent(VALID_ANONYMOUS_EVENT, logOutcomes);
+      await EventTrackingService.postEvent(VALID_ANONYMOUS_EVENT, logOutcomes, raiseExceptions);
     });
 
     expect(error).not.toBeInstanceOf(NoErrorThrownError);
     expect(fetchMocker.requests().length).toBe(1); // Does not retry on failure
     expect(error.message).toBe("Error interfacing with Mini Digital.");
+  });
+
+  it("Does not throw exceptions when raising exceptions is not true", async () => {
+    fetchMocker.once((request) => {
+      describeRequest(request, logOutcomes);
+      throw new Error("Simulating throwing an error");
+    });
+
+    // Runs in a browser-like environment
+    const error = await getError<Error>(async () => {
+      await EventTrackingService.postEvent(VALID_ANONYMOUS_EVENT, logOutcomes);
+    });
+
+    expect(error).toBeInstanceOf(NoErrorThrownError);
   });
 
   it("Doesn't send a request when config.pauseTracking is true", async () => {

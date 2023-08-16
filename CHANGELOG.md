@@ -1,5 +1,12 @@
 # Mini Digital SDK Changelog
 
+## [v1.4.1](https://github.com/WunderbarNetwork/mini-digital-sdk-js/compare/v1.3.1...v1.4.0) (2023-08-16)
+
+Added:
+
+- Optional parameter `raiseExceptions` has been added to `EventTrackingService.postEvent()` function. 
+  This ensures that the SDK will not raise exceptions unexpectedly, instead a `console.error()` will present the error when set as default(false).
+
 ## [v1.4.0](https://github.com/WunderbarNetwork/mini-digital-sdk-js/compare/v1.3.1...v1.4.0) (2023-07-26)
 
 ⚠️ Bundle location and file names have been modified, and ESM/UMD/CJS bundles now sit in the `lib/bundles` folder.
