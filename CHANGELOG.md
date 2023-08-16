@@ -5,7 +5,7 @@
 Added:
 
 - Optional parameter `raiseExceptions` has been added to `EventTrackingService.postEvent()` function. 
-  This ensures that the SDK will not raise exceptions unexpectedly, instead a `console.error()` will present the error.
+  This ensures that the SDK will not raise exceptions unexpectedly, instead a `console.error()` will present the error when set as default(false).
 
 ## [v1.4.0](https://github.com/WunderbarNetwork/mini-digital-sdk-js/compare/v1.3.1...v1.4.0) (2023-07-26)
 
