@@ -21,45 +21,54 @@ const isBrowser: boolean = typeof window !== "undefined" && typeof window.docume
  *
  * @param event Event to be stored
  * @param logResponse Optional - output to console when event has been successfully posted (default = false)
+ * @param raiseExceptions Optional - Throws exceptions (default = false)
  */
-export async function postEvent(event: AnalyticsEvent, logResponse: boolean = false): Promise<void> {
+export async function postEvent(event: AnalyticsEvent, logResponse: boolean = false, raiseExceptions: boolean = false): Promise<void> {
   // If tracking was turned off, don't go any further.
   if (config.pauseTracking) return;
 
   let miniDigitalUrl: string = config.miniDigitalUrl;
 
-  if (isStringNullOrEmpty(miniDigitalUrl)) {
-    throw new Error("The Mini Digital URL has not been defined in the config.");
-  }
+  try {
+    if (isStringNullOrEmpty(miniDigitalUrl)) {
+      throw new Error("The Mini Digital URL has not been defined in the config.");
+    }
 
-  // The gateway should not end with a trailing slash
-  if (miniDigitalUrl.endsWith("/")) {
-    miniDigitalUrl = miniDigitalUrl.substring(0, miniDigitalUrl.length - 1);
-  }
+    // The gateway should not end with a trailing slash
+    if (miniDigitalUrl.endsWith("/")) {
+      miniDigitalUrl = miniDigitalUrl.substring(0, miniDigitalUrl.length - 1);
+    }
 
-  // Enrich the event with additional fields, before submitting to the remote endpoint
-  const analyticsEvent = eventEnrichment(event, isBrowser);
+    // Enrich the event with additional fields, before submitting to the remote endpoint
+    const analyticsEvent = eventEnrichment(event, isBrowser);
 
-  // Send the event to the server using the correct authentication method (JWT tokens if running inside the browser, API keys otherwise).
-  // Also, attempt multiple times on HTTP 500 errors (which are by default temporary).
-  if (isBrowser) {
-    await retryAsyncFetchFunction(
-      async () => {
-        // Running from within the browser
-        await postEventJwt(analyticsEvent, miniDigitalUrl, logResponse);
-      },
-      config.errorRetryIntervalMs,
-      config.maxRetriesOn500,
-    );
-  } else {
-    await retryAsyncFetchFunction(
-      async () => {
-        // Running from within Node.js, use API Keys
-        await postEventApiKey(analyticsEvent, miniDigitalUrl, logResponse);
-      },
-      config.errorRetryIntervalMs,
-      config.maxRetriesOn500,
-    );
+    // Send the event to the server using the correct authentication method (JWT tokens if running inside the browser, API keys otherwise).
+    // Also, attempt multiple times on HTTP 500 errors (which are by default temporary).
+    if (isBrowser) {
+      await retryAsyncFetchFunction(
+        async () => {
+          // Running from within the browser
+          await postEventJwt(analyticsEvent, miniDigitalUrl, logResponse);
+        },
+        config.errorRetryIntervalMs,
+        config.maxRetriesOn500,
+      );
+    } else {
+      await retryAsyncFetchFunction(
+        async () => {
+          // Running from within Node.js, use API Keys
+          await postEventApiKey(analyticsEvent, miniDigitalUrl, logResponse);
+        },
+        config.errorRetryIntervalMs,
+        config.maxRetriesOn500,
+      );
+    }
+  } catch (err) {
+    if (raiseExceptions) { 
+      throw err;
+    } else {
+      console.error(err);
+    }
   }
 }
 

@@ -1,6 +1,6 @@
 {
   "name": "@wunderbar-network/mini-digital-sdk",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "SDK for back-end (Node) and front-end (TypeScript/JavaScript) applications, to send analytics events to Mini.Digital",
   "private": false,
   "type": "module",
