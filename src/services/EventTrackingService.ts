@@ -64,7 +64,7 @@ export async function postEvent(event: AnalyticsEvent, logResponse: boolean = fa
       );
     }
   } catch (err) {
-    if (raiseExceptions) { 
+    if (raiseExceptions) {
       throw err;
     } else {
       console.error(err);
